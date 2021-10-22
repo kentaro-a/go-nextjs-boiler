@@ -1,0 +1,4 @@
+/src/tmp/*
+/src/config/*
+!/src/config/config.go
+!/src/config/config.sample.json

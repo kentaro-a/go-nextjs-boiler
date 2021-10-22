@@ -1,0 +1,73 @@
+# mutagen compose -f mutagen-compose.yml up
+version: '3'
+services:
+  db:
+    image: 'mysql:5.7'
+    environment:
+      MYSQL_ROOT_PASSWORD: '12345678abc' 
+      MYSQL_DATABASE: 'app'
+      MYSQL_USER: 'app'
+      MYSQL_PASSWORD: '12345678abc'
+      TZ: 'Asia/Tokyo'
+    volumes:
+      - ./db/sqls:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+  phpmyadmin:
+    image: 'phpmyadmin/phpmyadmin'
+    environment:
+      - PMA_HOSTS=db
+      - PMA_USER=root
+      - PMA_PASSWORD=12345678abc
+    ports:
+      - 20000:80
+  backend:
+    tty: true
+    build: ./backend/
+    ports:
+      - 20001:3000
+    volumes:
+      - mutagen-backend:/backend
+    environment:
+      TZ: 'Asia/Tokyo'
+  frontend:
+    tty: true
+    build: ./frontend/
+    ports:
+      - 20002:3000
+    volumes:
+      - mutagen-frontend:/frontend
+    environment:
+      TZ: 'Asia/Tokyo'
+
+
+volumes:
+  mutagen-backend:
+  mutagen-frontend:
+
+# https://tech.griphone.co.jp/2020/09/17/accelerate-docker-with-mutagen/
+x-mutagen:
+  sync:
+    defaults:
+      ignore:
+        vcs: true
+    mutagen-backend:
+      alpha: "./backend"
+      beta: "volume://mutagen-backend"
+      mode: "two-way-resolved"
+      ignore:
+        paths:
+      configurationBeta:
+        permissions:
+          defaultFileMode: 0666
+          defaultDirectoryMode: 0777
+    mutagen-frontend:
+      alpha: "./frontend"
+      beta: "volume://mutagen-frontend"
+      mode: "two-way-resolved"
+      ignore:
+        paths:
+      configurationBeta:
+        permissions:
+          defaultFileMode: 0666
+          defaultDirectoryMode: 0777
