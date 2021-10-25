@@ -2,3 +2,4 @@
 /src/config/*
 !/src/config/config.go
 !/src/config/config.sample.json
+/src/tests/_requests/*

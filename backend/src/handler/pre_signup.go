@@ -71,9 +71,6 @@ func (h Handler) PreSignUp(c echo.Context) error {
 		})
 	}
 
-	// Commit transaction
-	tx.Commit()
-
 	// トークン付きの本登録URLをメールで送信
 	sender := mail.NewSender("pre_signup", user_mail_auth.Mail, "仮登録完了のお知らせ", map[string]string{
 		"@MAIL@":       user_mail_auth.Mail,
@@ -81,6 +78,7 @@ func (h Handler) PreSignUp(c echo.Context) error {
 	})
 	err = sender.Send()
 	if err != nil {
+		tx.Rollback()
 		return response.SystemError(c, &app_log.Fields{
 			ScriptInfo: app_log.GetScriptInfo(runtime.Caller(0)),
 			Messages:   []string{err.Error()},
@@ -88,5 +86,7 @@ func (h Handler) PreSignUp(c echo.Context) error {
 		})
 	}
 
+	// Commit transaction
+	tx.Commit()
 	return response.Success(c, 200, nil, nil)
 }
