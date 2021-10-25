@@ -38,9 +38,9 @@
 	},
 	"mail": {
 		"smtp": {
-			"host": "",
-			"port": 0,
-			"timeout": 30,
+			"host": "smtp",
+			"port": 1025,
+			"timeout": 30,	
 			"user": "",
 			"password": ""
 		},
