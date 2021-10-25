@@ -21,6 +21,13 @@ services:
       - PMA_PASSWORD=12345678abc
     ports:
       - 20000:80
+  smtp:
+    image: 'mailhog/mailhog'
+    environment:
+      TZ: 'Asia/Tokyo'
+    ports:
+      - 1025:1025
+      - 8025:8025 
   backend:
     tty: true
     build: ./backend/

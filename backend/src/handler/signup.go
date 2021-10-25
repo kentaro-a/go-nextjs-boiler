@@ -24,9 +24,12 @@ func (h Handler) SignUpVerifyToken(c echo.Context) error {
 }
 
 func (h Handler) SignUp(c echo.Context) error {
+	user_mail_auth := c.Get("user_mail_auth").(model.UserMailAuth)
 	user_model := model.NewUserModel(h.DB)
 	user := model.User{}
 	c.Bind(&user)
+	user.Mail = user_mail_auth.Mail
+	user.StatusFlg = 0
 
 	vld := app_validator.Get()
 	err := vld.Struct(user)
@@ -49,10 +52,10 @@ func (h Handler) SignUp(c echo.Context) error {
 
 	tx := h.DB.Begin()
 	user_mail_auth_model := model.NewUserMailAuthModel(tx)
-	user_mail_auth := c.Get("user_mail_auth").(model.UserMailAuth)
 	user_model = model.NewUserModel(tx)
 
 	// usersに登録
+	user.Password = user_model.GetHashedPassword(user.Password)
 	err = user_model.Create(&user)
 	if err != nil {
 		tx.Rollback()
