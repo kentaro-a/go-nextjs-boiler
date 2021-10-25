@@ -74,7 +74,7 @@ func (h Handler) PreSignUp(c echo.Context) error {
 	// トークン付きの本登録URLをメールで送信
 	sender := mail.NewSender("pre_signup", user_mail_auth.Mail, "仮登録完了のお知らせ", map[string]string{
 		"@MAIL@":       user_mail_auth.Mail,
-		"@SIGNUP_URL@": fmt.Sprintf("%ssignup/%s", config.Get().App.Domain, user_mail_auth.Token),
+		"@SIGNUP_URL@": fmt.Sprintf("%ssignup/%s", config.Get().App.FrontendDomain, user_mail_auth.Token),
 	})
 	err = sender.Send()
 	if err != nil {

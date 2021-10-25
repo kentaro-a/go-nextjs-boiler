@@ -28,6 +28,7 @@ type Config struct {
 type App struct {
 	Name              string            `json:"name"`
 	Domain            string            `json:"domain"`
+	FrontendDomain    string            `json:"frontend_domain"`
 	PreSignUp         preSignUp         `json:"pre_signup"`
 	PreForgotPassword preForgotPassword `json:"pre_forgot_password"`
 }

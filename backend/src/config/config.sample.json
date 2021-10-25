@@ -2,7 +2,8 @@
 	"mode": "dev",
 	"app": {
 		"name": "[DEV] Sample App",
-		"domain": "http://192.168.99.119:20000/",
+		"domain": "http://192.168.99.119:20001/",
+		"frontend_domain": "http://192.168.99.119:20002/",
 		"pre_signup": {
 			"lifetime": 3600 
 		},
