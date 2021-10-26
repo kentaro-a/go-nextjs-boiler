@@ -2,8 +2,13 @@ package handler
 
 import (
 	app_middleware "app/middleware"
+	"app/model"
 	app_session "app/session"
 	"app/tests"
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	middleware "github.com/labstack/echo/v4/middleware"
@@ -13,6 +18,7 @@ import (
 
 func setup(t *testing.T) (*echo.Echo, Handler, app_middleware.Middleware, *tests.Seeder) {
 	e := echo.New()
+	e.Use(app_middleware.Context)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(app_middleware.Cors())
@@ -41,4 +47,17 @@ func unSeedAll(seeder *tests.Seeder) {
 		"sessions",
 	}
 	seeder.UnSeed(truncate_tables...)
+}
+
+func getSignInCookie(e *echo.Echo, h Handler, m app_middleware.Middleware, seeder *tests.Seeder, user_id int64) string {
+	e.POST("/signin", h.SignIn)
+	var user model.User
+	seeder.DB.Find(&user, []int64{user_id})
+	post_data, _ := json.Marshal(map[string]interface{}{"mail": user.Mail, "password": "12345678abc"})
+	req := httptest.NewRequest(http.MethodPost, "/signin", bytes.NewReader(post_data))
+	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	rec := httptest.NewRecorder()
+	e.ServeHTTP(rec, req)
+	cookie := rec.Header().Get("Set-Cookie")
+	return cookie
 }

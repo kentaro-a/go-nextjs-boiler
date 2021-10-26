@@ -13,6 +13,7 @@ import (
 
 func setup(t *testing.T) (*echo.Echo, app_handler.Handler, Middleware, *tests.Seeder) {
 	e := echo.New()
+	e.Use(Context)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(Cors())

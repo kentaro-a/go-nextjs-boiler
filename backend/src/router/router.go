@@ -21,6 +21,7 @@ func New() (*echo.Echo, error) {
 	e := echo.New()
 
 	// middlewares
+	e.Use(app_middleware.Context)
 	e.Use(middleware.Recover())
 	e.Use(m.Session())
 	e.Use(app_middleware.Cors())
@@ -32,7 +33,7 @@ func New() (*echo.Echo, error) {
 	e.POST("/signup_verify_token/:token", h.SignUpVerifyToken, m.VerifyUserMailAuth)
 	e.POST("/signup/:token", h.SignUp, m.VerifyUserMailAuth)
 
-	e.GET("/dashboard", h.Dashboard, m.UserAuthentication)
+	e.POST("/dashboard", h.Dashboard, m.RequireSignIn)
 
 	return e, nil
 }

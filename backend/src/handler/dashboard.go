@@ -8,6 +8,6 @@ import (
 )
 
 func (h Handler) Dashboard(c echo.Context) error {
-	user, _ := c.Get("user").(model.User)
+	user, _ := c.Get("signin_user").(model.User)
 	return response.Success(c, 200, map[string]interface{}{"user": user}, nil)
 }

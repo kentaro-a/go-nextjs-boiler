@@ -30,7 +30,7 @@ func TestSignIn(t *testing.T) {
 
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
-		assert.Equal(t, res.StatusCode, rec.Code)
+		assert.Equal(t, 200, rec.Code)
 		assert.Empty(t, res.Data)
 		assert.NotEmpty(t, rec.Header().Get("Set-Cookie"))
 
