@@ -20,7 +20,7 @@ type User struct {
 	ID        uint      `gorm:"primaryKey" json:"id" ja:"ID"`
 	Name      string    `json:"name" validate:"required,max=255" ja:"ユーザー名"`
 	Mail      string    `gorm:"unique" json:"mail" validate:"email,required,max=255" ja:"メールアドレス"`
-	Password  string    `json:"password" validate:"required,min=8,max=30" ja:"パスワード"`
+	Password  string    `json:"password" validate:"required,min=8,max=64" ja:"パスワード"`
 	StatusFlg int       `json:"status_flg" validate:"number,min=0,max=9" ja:"ステータス"`
 	CreatedAt time.Time `gorm:"created_at" json:"created_at"`
 	UpdatedAt time.Time `gorm:"updated_at" json:"updated_at"`

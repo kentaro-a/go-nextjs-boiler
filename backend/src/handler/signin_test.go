@@ -3,7 +3,6 @@ package handler
 import (
 	"app/model"
 	"app/response"
-	"app/util"
 	"bytes"
 	"encoding/json"
 	"net/http"
@@ -32,13 +31,9 @@ func TestSignIn(t *testing.T) {
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(t, res.StatusCode, rec.Code)
-		assert.NotEmpty(t, res.Data)
-
-		d := res.Data.(map[string]interface{})
-		var actual_user model.User
-		util.MapToStruct(d["user"], &actual_user)
-		assert.Equal(t, expected_user.ID, actual_user.ID)
+		assert.Empty(t, res.Data)
 		assert.NotEmpty(t, rec.Header().Get("Set-Cookie"))
+
 	}
 	// status_flg=0のユーザー
 	{
