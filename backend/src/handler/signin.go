@@ -38,7 +38,8 @@ func (h Handler) SignIn(c echo.Context) error {
 
 	if err == nil {
 		sess, _ := session.Get(c, conf.Session.Key)
-		buser, _ := json.Marshal(user)
+		user_without_secrets := user.NewUserWithoutSecrets()
+		buser, _ := json.Marshal(user_without_secrets)
 		sess.Values["signin_user"] = buser
 		sess.Save(c.Request(), c.Response())
 
@@ -54,5 +55,5 @@ func (h Handler) SignIn(c echo.Context) error {
 		}
 	}
 
-	return response.Success(c, 200, map[string]interface{}{"user": user}, nil)
+	return response.Success(c, 200, nil, nil)
 }

@@ -17,8 +17,10 @@ func (h Handler) SignUpVerifyToken(c echo.Context) error {
 	// middlewareでトークン検証しているので、このハンドラに渡った時点でトークンは正しいことが担保されている
 	user_mail_auth := c.Get("user_mail_auth").(model.UserMailAuth)
 	return response.Success(c, 200, map[string]interface{}{
-		"mail":  user_mail_auth.Mail,
-		"token": user_mail_auth.Token,
+		"mail":      user_mail_auth.Mail,
+		"function":  user_mail_auth.Function,
+		"token":     user_mail_auth.Token,
+		"expire_at": user_mail_auth.ExpireAt,
 	}, nil)
 
 }

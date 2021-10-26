@@ -26,6 +26,11 @@ type User struct {
 	UpdatedAt time.Time `gorm:"updated_at" json:"updated_at"`
 }
 
+func (user User) NewUserWithoutSecrets() User {
+	user.Password = ""
+	return user
+}
+
 func NewUserModel(db *gorm.DB) *UserModel {
 	return &UserModel{
 		DB: db,

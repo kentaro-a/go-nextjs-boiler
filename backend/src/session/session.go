@@ -16,9 +16,6 @@ import (
 
 var store *mysqlstore.MySQLStore
 
-func init() {
-}
-
 func GetStore(db *gorm.DB) *mysqlstore.MySQLStore {
 	if store == nil {
 		c := config.Get()
