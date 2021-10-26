@@ -31,7 +31,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `users` (
   `id` int(10) UNSIGNED NOT NULL,
   `name` varchar(255) NOT NULL,
-  `mail` varchar(255) NOT NULL,
+  `mail` varchar(255) UNIQUE NOT NULL,
   `password` char(64) NOT NULL,
   `status_flg` int(1) NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
