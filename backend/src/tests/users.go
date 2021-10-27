@@ -34,5 +34,14 @@ func UsersFixture() []*model.User {
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
+		{
+			ID:        4,
+			Name:      "pre_forgot_password_user1",
+			Mail:      "pre_forgot_password_user1@test.com",
+			Password:  "222f971b48b727d385973f5c560448ec3dfb952e07555a08583fa764fdddc36e",
+			StatusFlg: 0,
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
 	}
 }
