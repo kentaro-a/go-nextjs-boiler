@@ -29,9 +29,14 @@ func New() (*echo.Echo, error) {
 
 	// handlers
 	e.POST("/signin", h.SignIn)
+
 	e.POST("/pre_signup", h.PreSignUp)
 	e.POST("/signup_verify_token/:token", h.SignUpVerifyToken, m.VerifyUserMailAuth)
 	e.POST("/signup/:token", h.SignUp, m.VerifyUserMailAuth)
+
+	e.POST("/pre_forgot_password", h.PreForgotPassword)
+	e.POST("/forgot_password_verify_token/:token", h.ForgotPasswordVerifyToken, m.VerifyUserMailAuth)
+	e.POST("/forgot_password/:token", h.ForgotPassword, m.VerifyUserMailAuth)
 
 	e.POST("/dashboard", h.Dashboard, m.RequireSignIn)
 

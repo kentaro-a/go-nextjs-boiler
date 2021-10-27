@@ -24,3 +24,7 @@ func NewContext(c echo.Context) *Context {
 		nil,
 	}
 }
+
+func CastContext(c echo.Context) *Context {
+	return c.(*Context)
+}

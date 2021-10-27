@@ -28,7 +28,7 @@ func (h Handler) PreSignUp(c echo.Context) error {
 		return response.Error(c, 400, messages, nil)
 	}
 
-	is_exist, err := user_model.IsMailExist(user.Mail)
+	is_exist, _, err := user_model.IsMailExist(user.Mail)
 	if err != nil {
 		return response.SystemError(c, &app_log.Fields{
 			ScriptInfo: app_log.GetScriptInfo(runtime.Caller(0)),

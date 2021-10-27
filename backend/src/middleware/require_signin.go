@@ -14,7 +14,7 @@ func (m Middleware) RequireSignIn(next echo.HandlerFunc) echo.HandlerFunc {
 		if !is_signedin {
 			return response.Error(c, 401, nil, nil)
 		}
-		cc := c.(*app_context.Context)
+		cc := app_context.CastContext(c)
 		cc.User = &user
 		return next(cc)
 	}

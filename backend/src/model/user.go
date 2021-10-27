@@ -49,15 +49,21 @@ func (m *UserModel) Create(user *User) error {
 	return errors.WithStack(err)
 }
 
-func (m *UserModel) IsMailExist(mail string) (bool, error) {
+func (m *UserModel) Save(user *User) error {
+	err := m.DB.Save(user).Error
+	return errors.WithStack(err)
+}
+
+func (m *UserModel) IsMailExist(mail string) (bool, *User, error) {
 	is_exist := false
+	user := User{}
 	var err error
 
 	err = m.DB.Where(
 		"mail = ? AND status_flg = ?",
 		mail,
 		0,
-	).First(&User{}).Error
+	).First(&user).Error
 
 	if err == nil {
 		is_exist = true
@@ -67,7 +73,18 @@ func (m *UserModel) IsMailExist(mail string) (bool, error) {
 			err = nil
 		}
 	}
-	return is_exist, errors.WithStack(err)
+	return is_exist, &user, errors.WithStack(err)
+}
+
+func (m *UserModel) FindByMail(mail string) (*User, error) {
+	var user User
+	// status_flg = 0などstructで検索するとゼロ値は検索条件から除外されるので直接指定する
+	err := m.DB.Where(
+		"mail = ? AND status_flg = ?",
+		mail,
+		0,
+	).First(&user).Error
+	return &user, errors.WithStack(err)
 }
 
 func (m *UserModel) FindByMailPassword(mail, encrypted_password string) (*User, error) {
