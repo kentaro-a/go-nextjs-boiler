@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	"app/config"
@@ -6,14 +6,14 @@ import (
 	"app/mail"
 	"app/model"
 	"app/response"
-	"app/util"
+	app_validator "app/validator"
 	"fmt"
 	"runtime"
 
 	echo "github.com/labstack/echo/v4"
 )
 
-func (h Handler) ForgotPasswordVerifyToken(c echo.Context) error {
+func (h Handler) SignUpVerifyToken(c echo.Context) error {
 	// middlewareでトークン検証しているので、このハンドラに渡った時点でトークンは正しいことが担保されている
 	user_mail_auth := c.Get("user_mail_auth").(model.UserMailAuth)
 	return response.Success(c, 200, map[string]interface{}{
@@ -25,11 +25,22 @@ func (h Handler) ForgotPasswordVerifyToken(c echo.Context) error {
 
 }
 
-func (h Handler) ForgotPassword(c echo.Context) error {
+func (h Handler) SignUp(c echo.Context) error {
 	user_mail_auth := c.Get("user_mail_auth").(model.UserMailAuth)
 	user_model := model.NewUserModel(h.DB)
+	user := model.User{}
+	c.Bind(&user)
+	user.Mail = user_mail_auth.Mail
+	user.StatusFlg = 0
 
-	is_exist, user, err := user_model.IsMailExist(user_mail_auth.Mail)
+	vld := app_validator.Get()
+	err := vld.Struct(user)
+	if err != nil {
+		messages := app_validator.GetErrorMessages(&model.User{}, err)
+		return response.Error(c, 400, messages, nil)
+	}
+
+	is_exist, _, err := user_model.IsMailExist(user.Mail)
 	if err != nil {
 		return response.SystemError(c, &app_log.Fields{
 			ScriptInfo: app_log.GetScriptInfo(runtime.Caller(0)),
@@ -37,20 +48,17 @@ func (h Handler) ForgotPassword(c echo.Context) error {
 			Error:      err,
 		})
 	}
-	if !is_exist {
-		return response.Error(c, 400, []string{"メールアドレスが登録されていません"}, nil)
+	if is_exist {
+		return response.Error(c, 400, []string{"すでに登録済みのメールアドレスです"}, nil)
 	}
 
 	tx := h.DB.Begin()
 	user_mail_auth_model := model.NewUserMailAuthModel(tx)
 	user_model = model.NewUserModel(tx)
 
-	// ランダムパスワード生成
-	new_password := util.MakeRandStr(20)
-
-	// パスワード更新
-	user.Password = user_model.GetHashedPassword(new_password)
-	err = user_model.Save(user)
+	// usersに登録
+	user.Password = user_model.GetHashedPassword(user.Password)
+	err = user_model.Create(&user)
 	if err != nil {
 		tx.Rollback()
 		return response.SystemError(c, &app_log.Fields{
@@ -72,10 +80,9 @@ func (h Handler) ForgotPassword(c echo.Context) error {
 	}
 
 	// トークン付きの本登録URLをメールで送信
-	sender := mail.NewSender("forgot_password", user.Mail, "パスワード再発行完了のお知らせ", map[string]string{
-		"@NAME@":         user.Name,
-		"@SIGNIN_URL@":   fmt.Sprintf("%ssignin", config.Get().App.Domain),
-		"@NEW_PASSWORD@": new_password,
+	sender := mail.NewSender("signup", user.Mail, "会員登録完了のお知らせ", map[string]string{
+		"@NAME@":       user.Name,
+		"@SIGNIN_URL@": fmt.Sprintf("%ssignin", config.Get().App.Domain),
 	})
 	err = sender.Send()
 	if err != nil {

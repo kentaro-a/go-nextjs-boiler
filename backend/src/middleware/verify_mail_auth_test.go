@@ -13,12 +13,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVerifyUserMailAuth(t *testing.T) {
+func TestVerifyMailAuth(t *testing.T) {
 	e, _, m, seeder := setup(t)
 
 	e.POST("/test/:token", func(c echo.Context) error {
 		return response.Success(c, 200, nil, nil)
-	}, m.VerifyUserMailAuth)
+	}, m.VerifyMailAuth)
 
 	// valid token
 	{

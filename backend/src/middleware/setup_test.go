@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	app_handler "app/handler"
+	user_handler "app/handler/user"
 	app_session "app/session"
 	"app/tests"
 	"testing"
@@ -11,7 +11,11 @@ import (
 	echo "github.com/labstack/echo/v4"
 )
 
-func setup(t *testing.T) (*echo.Echo, app_handler.Handler, Middleware, *tests.Seeder) {
+type Handlers struct {
+	UserHandler user_handler.Handler
+}
+
+func setup(t *testing.T) (*echo.Echo, Handlers, Middleware, *tests.Seeder) {
 	e := echo.New()
 	e.Use(Context)
 	e.Use(middleware.Logger())
@@ -23,8 +27,12 @@ func setup(t *testing.T) (*echo.Echo, app_handler.Handler, Middleware, *tests.Se
 	seeder.Seed(tests.UserMailAuthsFixture(), tests.UsersFixture())
 	m := Middleware{DB: seeder.DB}
 	e.Use(m.Session())
-	h := app_handler.Handler{DB: seeder.DB}
-	return e, h, m, seeder
+	h := user_handler.Handler{DB: seeder.DB}
+
+	handlers := Handlers{
+		UserHandler: h,
+	}
+	return e, handlers, m, seeder
 
 }
 

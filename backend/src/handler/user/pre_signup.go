@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	"app/config"
@@ -15,7 +15,7 @@ import (
 	echo "github.com/labstack/echo/v4"
 )
 
-func (h Handler) PreForgotPassword(c echo.Context) error {
+func (h Handler) PreSignUp(c echo.Context) error {
 
 	user_model := model.NewUserModel(h.DB)
 	user := model.User{}
@@ -23,7 +23,6 @@ func (h Handler) PreForgotPassword(c echo.Context) error {
 
 	vld := app_validator.Get()
 	err := vld.StructPartial(user, "Mail")
-
 	if err != nil {
 		messages := app_validator.GetErrorMessages(&model.User{}, err)
 		return response.Error(c, 400, messages, nil)
@@ -37,17 +36,17 @@ func (h Handler) PreForgotPassword(c echo.Context) error {
 			Error:      err,
 		})
 	}
-	if !is_exist {
-		return response.Error(c, 400, []string{"メールアドレスが登録されていません"}, nil)
+	if is_exist {
+		return response.Error(c, 400, []string{"すでに登録済みのメールアドレスです"}, nil)
 	}
 
 	tx := h.DB.Begin()
 	user_mail_auth_model := model.NewUserMailAuthModel(tx)
 	user_mail_auth := model.UserMailAuth{
-		Function: "pre_forgot_password",
+		Function: "pre_signup",
 		Mail:     user.Mail,
 		Token:    util.MakeRandStr(62),
-		ExpireAt: time.Now().Add(time.Second * time.Duration(config.Get().App.PreForgotPassword.Lifetime)), // 有効期限
+		ExpireAt: time.Now().Add(time.Second * time.Duration(config.Get().App.PreSignUp.Lifetime)), // 有効期限
 	}
 
 	// まずすでに登録されてる仮登録データを削除
@@ -72,10 +71,10 @@ func (h Handler) PreForgotPassword(c echo.Context) error {
 		})
 	}
 
-	// トークン付きの再発行URLをメールで送信
-	sender := mail.NewSender("pre_forgot_password", user_mail_auth.Mail, "パスワード再発行に関しまして", map[string]string{
-		"@MAIL@":                user_mail_auth.Mail,
-		"@FORGOT_PASSWORD_URL@": fmt.Sprintf("%sforgot_password/%s", config.Get().App.FrontendDomain, user_mail_auth.Token),
+	// トークン付きの本登録URLをメールで送信
+	sender := mail.NewSender("pre_signup", user_mail_auth.Mail, "仮登録完了のお知らせ", map[string]string{
+		"@MAIL@":       user_mail_auth.Mail,
+		"@SIGNUP_URL@": fmt.Sprintf("%ssignup/%s", config.Get().App.FrontendDomain, user_mail_auth.Token),
 	})
 	err = sender.Send()
 	if err != nil {

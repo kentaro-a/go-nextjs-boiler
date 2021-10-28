@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	"app/model"
@@ -19,12 +19,12 @@ import (
 
 func TestSignUpVerifyToken(t *testing.T) {
 	e, h, m, seeder := setup(t)
-	e.POST("/signup_verify_token/:token", h.SignUpVerifyToken, m.VerifyUserMailAuth)
+	e.POST("/user/signup_verify_token/:token", h.SignUpVerifyToken, m.VerifyMailAuth)
 
 	// 正常
 	{
 		token := "pre_signup_ValidToken"
-		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/signup_verify_token/%s", token), nil)
+		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup_verify_token/%s", token), nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -42,7 +42,7 @@ func TestSignUp(t *testing.T) {
 	// 正常
 	{
 		e, h, m, seeder := setup(t)
-		e.POST("/signup/:token", h.SignUp, m.VerifyUserMailAuth)
+		e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
 		var expected_user_mail_auth model.UserMailAuth
 		seeder.DB.Find(&expected_user_mail_auth, []int64{1})
@@ -50,7 +50,7 @@ func TestSignUp(t *testing.T) {
 		password := "12345678"
 		post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
 
-		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
+		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -78,7 +78,7 @@ func TestSignUp(t *testing.T) {
 		{
 			{
 				e, h, m, seeder := setup(t)
-				e.POST("/signup/:token", h.SignUp, m.VerifyUserMailAuth)
+				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
 				var expected_user_mail_auth model.UserMailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
@@ -86,7 +86,7 @@ func TestSignUp(t *testing.T) {
 				password := "12345678"
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
 
-				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
+				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
 				e.ServeHTTP(rec, req)
@@ -109,14 +109,14 @@ func TestSignUp(t *testing.T) {
 			}
 			{
 				e, h, m, seeder := setup(t)
-				e.POST("/signup/:token", h.SignUp, m.VerifyUserMailAuth)
+				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
 				var expected_user_mail_auth model.UserMailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				password := "12345678"
 				post_data, _ := json.Marshal(map[string]interface{}{"password": password})
 
-				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
+				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
 				e.ServeHTTP(rec, req)
@@ -139,7 +139,7 @@ func TestSignUp(t *testing.T) {
 			}
 			{
 				e, h, m, seeder := setup(t)
-				e.POST("/signup/:token", h.SignUp, m.VerifyUserMailAuth)
+				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
 				var expected_user_mail_auth model.UserMailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
@@ -147,7 +147,7 @@ func TestSignUp(t *testing.T) {
 				password := "12345678"
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
 
-				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
+				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
 				e.ServeHTTP(rec, req)
@@ -174,7 +174,7 @@ func TestSignUp(t *testing.T) {
 		{
 			{
 				e, h, m, seeder := setup(t)
-				e.POST("/signup/:token", h.SignUp, m.VerifyUserMailAuth)
+				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
 				var expected_user_mail_auth model.UserMailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
@@ -182,7 +182,7 @@ func TestSignUp(t *testing.T) {
 				password := ""
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
 
-				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
+				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
 				e.ServeHTTP(rec, req)
@@ -205,14 +205,14 @@ func TestSignUp(t *testing.T) {
 			}
 			{
 				e, h, m, seeder := setup(t)
-				e.POST("/signup/:token", h.SignUp, m.VerifyUserMailAuth)
+				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
 				var expected_user_mail_auth model.UserMailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := "myname"
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name})
 
-				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
+				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
 				e.ServeHTTP(rec, req)
@@ -230,7 +230,7 @@ func TestSignUp(t *testing.T) {
 			}
 			{
 				e, h, m, seeder := setup(t)
-				e.POST("/signup/:token", h.SignUp, m.VerifyUserMailAuth)
+				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
 				var expected_user_mail_auth model.UserMailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
@@ -238,7 +238,7 @@ func TestSignUp(t *testing.T) {
 				password := strings.Repeat("1", 65)
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
 
-				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
+				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
 				e.ServeHTTP(rec, req)
@@ -261,7 +261,7 @@ func TestSignUp(t *testing.T) {
 			}
 			{
 				e, h, m, seeder := setup(t)
-				e.POST("/signup/:token", h.SignUp, m.VerifyUserMailAuth)
+				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
 				var expected_user_mail_auth model.UserMailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
@@ -269,7 +269,7 @@ func TestSignUp(t *testing.T) {
 				password := strings.Repeat("1", 7)
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
 
-				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
+				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
 				e.ServeHTTP(rec, req)
@@ -297,7 +297,7 @@ func TestSignUp(t *testing.T) {
 	{
 		{
 			e, h, m, seeder := setup(t)
-			e.POST("/signup/:token", h.SignUp, m.VerifyUserMailAuth)
+			e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
 			var expected_user_mail_auth model.UserMailAuth
 			seeder.DB.Find(&expected_user_mail_auth, []int64{1})
@@ -318,7 +318,7 @@ func TestSignUp(t *testing.T) {
 
 			post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
 
-			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)
@@ -332,7 +332,7 @@ func TestSignUp(t *testing.T) {
 
 		{
 			e, h, m, seeder := setup(t)
-			e.POST("/signup/:token", h.SignUp, m.VerifyUserMailAuth)
+			e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
 			var expected_user_mail_auth model.UserMailAuth
 			seeder.DB.Find(&expected_user_mail_auth, []int64{1})
@@ -345,7 +345,7 @@ func TestSignUp(t *testing.T) {
 			ch := make(chan int, loop)
 			for i := 0; i < loop; i++ {
 				go func(post_data []byte, ch chan int) {
-					req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
+					req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 					req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 					rec := httptest.NewRecorder()
 					e.ServeHTTP(rec, req)

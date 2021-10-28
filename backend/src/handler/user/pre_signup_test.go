@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	"app/model"
@@ -16,13 +16,13 @@ import (
 func TestPreSignUp(t *testing.T) {
 	e, h, _, seeder := setup(t)
 
-	e.POST("/pre_signup", h.PreSignUp)
+	e.POST("/user/pre_signup", h.PreSignUp)
 
 	// 正常
 	{
 		mail := "test@test.com"
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
-		req := httptest.NewRequest(http.MethodPost, "/pre_signup", bytes.NewReader(post_data))
+		req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -50,7 +50,7 @@ func TestPreSignUp(t *testing.T) {
 		assert.Equal(t, 1, len(user_mail_auths_pre)) // Means any other records which have the same mail and function are not found.
 
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
-		req := httptest.NewRequest(http.MethodPost, "/pre_signup", bytes.NewReader(post_data))
+		req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -69,7 +69,7 @@ func TestPreSignUp(t *testing.T) {
 	{
 		mail := "user1@test.com"
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
-		req := httptest.NewRequest(http.MethodPost, "/pre_signup", bytes.NewReader(post_data))
+		req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -90,7 +90,7 @@ func TestPreSignUp(t *testing.T) {
 		{
 			mail := "usertest.com"
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
-			req := httptest.NewRequest(http.MethodPost, "/pre_signup", bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)
@@ -108,7 +108,7 @@ func TestPreSignUp(t *testing.T) {
 		{
 			mail := ""
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
-			req := httptest.NewRequest(http.MethodPost, "/pre_signup", bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)
@@ -125,7 +125,7 @@ func TestPreSignUp(t *testing.T) {
 		}
 		{
 			post_data, _ := json.Marshal(map[string]interface{}{})
-			req := httptest.NewRequest(http.MethodPost, "/pre_signup", bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)

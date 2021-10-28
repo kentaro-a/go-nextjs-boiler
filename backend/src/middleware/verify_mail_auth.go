@@ -9,7 +9,7 @@ import (
 	echo "github.com/labstack/echo/v4"
 )
 
-func (m Middleware) VerifyUserMailAuth(next echo.HandlerFunc) echo.HandlerFunc {
+func (m Middleware) VerifyMailAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user_mail_auth := model.UserMailAuth{}
 		user_mail_auth.Token = c.Param("token")

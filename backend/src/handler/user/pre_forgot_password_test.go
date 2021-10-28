@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	"app/model"
@@ -16,13 +16,13 @@ import (
 func TestPreForgotPassword(t *testing.T) {
 	e, h, _, seeder := setup(t)
 
-	e.POST("/pre_forgot_password", h.PreForgotPassword)
+	e.POST("/user/pre_forgot_password", h.PreForgotPassword)
 
 	// 正常
 	{
 		mail := "user1@test.com"
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
-		req := httptest.NewRequest(http.MethodPost, "/pre_forgot_password", bytes.NewReader(post_data))
+		req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -41,7 +41,7 @@ func TestPreForgotPassword(t *testing.T) {
 	{
 		mail := "test@test.com"
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
-		req := httptest.NewRequest(http.MethodPost, "/pre_forgot_password", bytes.NewReader(post_data))
+		req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -62,7 +62,7 @@ func TestPreForgotPassword(t *testing.T) {
 		{
 			mail := "usertest.com"
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
-			req := httptest.NewRequest(http.MethodPost, "/pre_forgot_password", bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)
@@ -80,7 +80,7 @@ func TestPreForgotPassword(t *testing.T) {
 		{
 			mail := ""
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
-			req := httptest.NewRequest(http.MethodPost, "/pre_forgot_password", bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)
@@ -97,7 +97,7 @@ func TestPreForgotPassword(t *testing.T) {
 		}
 		{
 			post_data, _ := json.Marshal(map[string]interface{}{})
-			req := httptest.NewRequest(http.MethodPost, "/pre_forgot_password", bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)

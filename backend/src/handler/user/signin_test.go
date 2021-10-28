@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	"app/model"
@@ -16,14 +16,14 @@ import (
 func TestSignIn(t *testing.T) {
 	e, h, _, seeder := setup(t)
 
-	e.POST("/signin", h.SignIn)
+	e.POST("/user/signin", h.SignIn)
 
 	// 正常
 	{
 		var expected_user model.User
 		seeder.DB.Find(&expected_user, []int64{1})
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": expected_user.Mail, "password": "12345678abc"})
-		req := httptest.NewRequest(http.MethodPost, "/signin", bytes.NewReader(post_data))
+		req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -40,7 +40,7 @@ func TestSignIn(t *testing.T) {
 		var expected_user model.User
 		seeder.DB.Find(&expected_user, []int64{3})
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": expected_user.Mail, "password": "12345678abc"})
-		req := httptest.NewRequest(http.MethodPost, "/signin", bytes.NewReader(post_data))
+		req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -55,7 +55,7 @@ func TestSignIn(t *testing.T) {
 		var expected_user model.User
 		seeder.DB.Find(&expected_user, []int64{1})
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": expected_user.Mail, "password": "12345678abcd"})
-		req := httptest.NewRequest(http.MethodPost, "/signin", bytes.NewReader(post_data))
+		req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -72,7 +72,7 @@ func TestSignIn(t *testing.T) {
 		var expected_user model.User
 		seeder.DB.Find(&expected_user, []int64{1})
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": "dummy" + expected_user.Mail, "password": "12345678abc"})
-		req := httptest.NewRequest(http.MethodPost, "/signin", bytes.NewReader(post_data))
+		req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -89,7 +89,7 @@ func TestSignIn(t *testing.T) {
 
 		{
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": "", "password": ""})
-			req := httptest.NewRequest(http.MethodPost, "/signin", bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)
@@ -101,7 +101,7 @@ func TestSignIn(t *testing.T) {
 		}
 		{
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": "aaaaaaa", "password": "12345678abc"})
-			req := httptest.NewRequest(http.MethodPost, "/signin", bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)
@@ -113,7 +113,7 @@ func TestSignIn(t *testing.T) {
 		}
 		{
 			post_data, _ := json.Marshal(map[string]interface{}{"password": "12345678abc"})
-			req := httptest.NewRequest(http.MethodPost, "/signin", bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)
@@ -127,7 +127,7 @@ func TestSignIn(t *testing.T) {
 
 		{
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": "user1@test.com", "password": "12"})
-			req := httptest.NewRequest(http.MethodPost, "/signin", bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)
@@ -141,7 +141,7 @@ func TestSignIn(t *testing.T) {
 
 		{
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": "user1@test.com", "password": "1234567890123456789012345678901"})
-			req := httptest.NewRequest(http.MethodPost, "/signin", bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)
@@ -155,7 +155,7 @@ func TestSignIn(t *testing.T) {
 
 		{
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": "user1@test.com"})
-			req := httptest.NewRequest(http.MethodPost, "/signin", bytes.NewReader(post_data))
+			req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			e.ServeHTTP(rec, req)

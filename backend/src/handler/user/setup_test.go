@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	app_middleware "app/middleware"
@@ -50,11 +50,11 @@ func unSeedAll(seeder *tests.Seeder) {
 }
 
 func getSignInCookie(e *echo.Echo, h Handler, m app_middleware.Middleware, seeder *tests.Seeder, user_id int64) string {
-	e.POST("/signin", h.SignIn)
+	e.POST("/user/signin", h.SignIn)
 	var user model.User
 	seeder.DB.Find(&user, []int64{user_id})
 	post_data, _ := json.Marshal(map[string]interface{}{"mail": user.Mail, "password": "12345678abc"})
-	req := httptest.NewRequest(http.MethodPost, "/signin", bytes.NewReader(post_data))
+	req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	rec := httptest.NewRecorder()
 	e.ServeHTTP(rec, req)

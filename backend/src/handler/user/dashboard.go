@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	app_context "app/context"

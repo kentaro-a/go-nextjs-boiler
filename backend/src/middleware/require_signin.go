@@ -8,7 +8,7 @@ import (
 	echo "github.com/labstack/echo/v4"
 )
 
-func (m Middleware) RequireSignIn(next echo.HandlerFunc) echo.HandlerFunc {
+func (m Middleware) RequireUserSignIn(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		is_signedin, user := app_session.IsSignedIn(c)
 		if !is_signedin {

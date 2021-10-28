@@ -1,4 +1,4 @@
-package handler
+package user
 
 import (
 	"app/model"
@@ -15,12 +15,12 @@ import (
 
 func TestForgotPasswordVerifyToken(t *testing.T) {
 	e, h, m, seeder := setup(t)
-	e.POST("/forgot_password_verify_token/:token", h.ForgotPasswordVerifyToken, m.VerifyUserMailAuth)
+	e.POST("/user/forgot_password_verify_token/:token", h.ForgotPasswordVerifyToken, m.VerifyMailAuth)
 
 	// 正常
 	{
 		token := "pre_forgot_password_ValidToken"
-		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/forgot_password_verify_token/%s", token), nil)
+		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/forgot_password_verify_token/%s", token), nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -38,7 +38,7 @@ func TestForgotPassword(t *testing.T) {
 	// 正常
 	{
 		e, h, m, seeder := setup(t)
-		e.POST("/forgot_password/:token", h.ForgotPassword, m.VerifyUserMailAuth)
+		e.POST("/user/forgot_password/:token", h.ForgotPassword, m.VerifyMailAuth)
 
 		var expected_user_mail_auth model.UserMailAuth
 		seeder.DB.Find(&expected_user_mail_auth, []int64{4})
@@ -48,7 +48,7 @@ func TestForgotPassword(t *testing.T) {
 		assert.Nil(t, err)
 		assert.NotEmpty(t, prev_user)
 
-		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/forgot_password/%s", expected_user_mail_auth.Token), nil)
+		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/forgot_password/%s", expected_user_mail_auth.Token), nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
