@@ -3,3 +3,5 @@ $ sh migrations/refresh.sh
 
 # test
 MODE=test go test -v ./handler/ -count=1 -run TestSignUpVerifyToken
+MODE=test go test ./... -count=1
+
