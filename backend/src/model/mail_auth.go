@@ -9,11 +9,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserMailAuthModel struct {
+type MailAuthModel struct {
 	DB *gorm.DB
 }
 
-type UserMailAuth struct {
+type MailAuth struct {
 	ID        uint      `gorm:"primaryKey" json:"id" ja:"ID"`
 	Function  string    `json:"function" validate:"required,max=255" ja:"機能"`
 	Mail      string    `gorm:"unique" json:"mail" validate:"email,required,max=255" ja:"メールアドレス"`
@@ -24,29 +24,29 @@ type UserMailAuth struct {
 	UpdatedAt time.Time `gorm:"updated_at" json:"updated_at"`
 }
 
-func NewUserMailAuthModel(db *gorm.DB) *UserMailAuthModel {
-	return &UserMailAuthModel{
+func NewMailAuthModel(db *gorm.DB) *MailAuthModel {
+	return &MailAuthModel{
 		DB: db,
 	}
 }
 
-func (m *UserMailAuthModel) Create(user_mail_auth *UserMailAuth) error {
+func (m *MailAuthModel) Create(user_mail_auth *MailAuth) error {
 	err := m.DB.Create(user_mail_auth).Error
 	return errors.WithStack(err)
 }
 
-func (m *UserMailAuthModel) DeleteByMailFunction(mail string, function string) error {
-	err := m.DB.Where("mail = ? AND function = ?", mail, function).Delete(&UserMailAuth{}).Error
+func (m *MailAuthModel) DeleteByMailFunction(mail string, function string) error {
+	err := m.DB.Where("mail = ? AND function = ?", mail, function).Delete(&MailAuth{}).Error
 	return errors.WithStack(err)
 }
 
-func (m *UserMailAuthModel) FindByMailFunction(mail string, function string) ([]UserMailAuth, error) {
-	list := []UserMailAuth{}
+func (m *MailAuthModel) FindByMailFunction(mail string, function string) ([]MailAuth, error) {
+	list := []MailAuth{}
 	err := m.DB.Where("mail = ? AND function = ?", mail, function).Find(&list).Error
 	return list, errors.WithStack(err)
 }
 
-func (m *UserMailAuthModel) IsExpiredToken(user_mail_auth *UserMailAuth) (bool, error) {
+func (m *MailAuthModel) IsExpiredToken(user_mail_auth *MailAuth) (bool, error) {
 	err := m.DB.Where("token = ? AND status_flg = 0 AND expire_at > ? ", user_mail_auth.Token, time.Now()).First(user_mail_auth).Error
 	if err != nil {
 		if !errors.Is(err, gorm.ErrRecordNotFound) {

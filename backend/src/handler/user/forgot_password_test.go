@@ -40,7 +40,7 @@ func TestForgotPassword(t *testing.T) {
 		e, h, m, seeder := setup(t)
 		e.POST("/user/forgot_password/:token", h.ForgotPassword, m.VerifyMailAuth)
 
-		var expected_user_mail_auth model.UserMailAuth
+		var expected_user_mail_auth model.MailAuth
 		seeder.DB.Find(&expected_user_mail_auth, []int64{4})
 
 		model_user := model.NewUserModel(seeder.DB)
@@ -57,7 +57,7 @@ func TestForgotPassword(t *testing.T) {
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(t, 200, rec.Code)
 
-		model_user_mail_auth := model.NewUserMailAuthModel(seeder.DB)
+		model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
 		user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
 		assert.Nil(t, err)
 		assert.Equal(t, 0, len(user_mail_auths)) // Means user_mail_auths record has been deleted.

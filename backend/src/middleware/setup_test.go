@@ -24,7 +24,7 @@ func setup(t *testing.T) (*echo.Echo, Handlers, Middleware, *tests.Seeder) {
 	e.Use(AccessLog)
 
 	seeder := tests.NewSeeder()
-	seeder.Seed(tests.UserMailAuthsFixture(), tests.UsersFixture())
+	seeder.Seed(tests.MailAuthsFixture(), tests.UsersFixture())
 	m := Middleware{DB: seeder.DB}
 	e.Use(m.Session())
 	h := user_handler.Handler{DB: seeder.DB}
@@ -40,7 +40,7 @@ func teardown(t *testing.T, e *echo.Echo, seeder *tests.Seeder) {
 	app_session.DeleteStore()
 	truncate_tables := []string{
 		"users",
-		"user_mail_auths",
+		"mail_auths",
 		"sessions",
 	}
 	seeder.UnSeed(truncate_tables...)

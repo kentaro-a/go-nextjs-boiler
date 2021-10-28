@@ -31,8 +31,8 @@ func TestPreForgotPassword(t *testing.T) {
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(t, 200, rec.Code)
 
-		m := model.NewUserMailAuthModel(seeder.DB)
-		user_mail_auths, err := m.FindByMailFunction(mail, "pre_forgot_password")
+		m := model.NewMailAuthModel(seeder.DB)
+		user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
 		assert.Nil(t, err)
 		assert.Equal(t, 1, len(user_mail_auths))
 	}
@@ -51,8 +51,8 @@ func TestPreForgotPassword(t *testing.T) {
 		assert.Equal(t, 400, rec.Code)
 		assert.Empty(t, res.Data)
 
-		m := model.NewUserMailAuthModel(seeder.DB)
-		user_mail_auths, err := m.FindByMailFunction(mail, "pre_forgot_password")
+		m := model.NewMailAuthModel(seeder.DB)
+		user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
 		assert.Nil(t, err)
 		assert.Equal(t, 0, len(user_mail_auths))
 	}
@@ -72,8 +72,8 @@ func TestPreForgotPassword(t *testing.T) {
 			assert.Equal(t, 400, rec.Code)
 			assert.Equal(t, 1, len(res.Error.Messages))
 
-			m := model.NewUserMailAuthModel(seeder.DB)
-			user_mail_auths, err := m.FindByMailFunction(mail, "pre_forgot_password")
+			m := model.NewMailAuthModel(seeder.DB)
+			user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
 			assert.Nil(t, err)
 			assert.Equal(t, 0, len(user_mail_auths))
 		}
@@ -90,8 +90,8 @@ func TestPreForgotPassword(t *testing.T) {
 			assert.Equal(t, 400, rec.Code)
 			assert.Equal(t, 1, len(res.Error.Messages))
 
-			m := model.NewUserMailAuthModel(seeder.DB)
-			user_mail_auths, err := m.FindByMailFunction(mail, "pre_forgot_password")
+			m := model.NewMailAuthModel(seeder.DB)
+			user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
 			assert.Nil(t, err)
 			assert.Equal(t, 0, len(user_mail_auths))
 		}

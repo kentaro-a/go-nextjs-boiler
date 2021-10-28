@@ -26,7 +26,7 @@ func setup(t *testing.T) (*echo.Echo, Handler, app_middleware.Middleware, *tests
 
 	seeder := tests.NewSeeder()
 	unSeedAll(seeder)
-	seeder.Seed(tests.UserMailAuthsFixture(), tests.UsersFixture())
+	seeder.Seed(tests.MailAuthsFixture(), tests.UsersFixture())
 	m := app_middleware.Middleware{DB: seeder.DB}
 	e.Use(m.Session())
 	h := Handler{DB: seeder.DB}
@@ -43,7 +43,7 @@ func teardown(t *testing.T, e *echo.Echo, seeder *tests.Seeder) {
 func unSeedAll(seeder *tests.Seeder) {
 	truncate_tables := []string{
 		"users",
-		"user_mail_auths",
+		"mail_auths",
 		"sessions",
 	}
 	seeder.UnSeed(truncate_tables...)

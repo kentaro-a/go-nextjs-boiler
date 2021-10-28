@@ -41,9 +41,9 @@ func (h Handler) PreSignUp(c echo.Context) error {
 	}
 
 	tx := h.DB.Begin()
-	user_mail_auth_model := model.NewUserMailAuthModel(tx)
-	user_mail_auth := model.UserMailAuth{
-		Function: "pre_signup",
+	user_mail_auth_model := model.NewMailAuthModel(tx)
+	user_mail_auth := model.MailAuth{
+		Function: "user/pre_signup",
 		Mail:     user.Mail,
 		Token:    util.MakeRandStr(62),
 		ExpireAt: time.Now().Add(time.Second * time.Duration(config.Get().App.PreSignUp.Lifetime)), // 有効期限

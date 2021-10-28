@@ -42,9 +42,9 @@ func (h Handler) PreForgotPassword(c echo.Context) error {
 	}
 
 	tx := h.DB.Begin()
-	user_mail_auth_model := model.NewUserMailAuthModel(tx)
-	user_mail_auth := model.UserMailAuth{
-		Function: "pre_forgot_password",
+	user_mail_auth_model := model.NewMailAuthModel(tx)
+	user_mail_auth := model.MailAuth{
+		Function: "user/pre_forgot_password",
 		Mail:     user.Mail,
 		Token:    util.MakeRandStr(62),
 		ExpireAt: time.Now().Add(time.Second * time.Duration(config.Get().App.PreForgotPassword.Lifetime)), // 有効期限

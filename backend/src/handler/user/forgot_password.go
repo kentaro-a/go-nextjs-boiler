@@ -15,7 +15,7 @@ import (
 
 func (h Handler) ForgotPasswordVerifyToken(c echo.Context) error {
 	// middlewareでトークン検証しているので、このハンドラに渡った時点でトークンは正しいことが担保されている
-	user_mail_auth := c.Get("user_mail_auth").(model.UserMailAuth)
+	user_mail_auth := c.Get("user_mail_auth").(model.MailAuth)
 	return response.Success(c, 200, map[string]interface{}{
 		"mail":      user_mail_auth.Mail,
 		"function":  user_mail_auth.Function,
@@ -26,7 +26,7 @@ func (h Handler) ForgotPasswordVerifyToken(c echo.Context) error {
 }
 
 func (h Handler) ForgotPassword(c echo.Context) error {
-	user_mail_auth := c.Get("user_mail_auth").(model.UserMailAuth)
+	user_mail_auth := c.Get("user_mail_auth").(model.MailAuth)
 	user_model := model.NewUserModel(h.DB)
 
 	is_exist, user, err := user_model.IsMailExist(user_mail_auth.Mail)
@@ -42,7 +42,7 @@ func (h Handler) ForgotPassword(c echo.Context) error {
 	}
 
 	tx := h.DB.Begin()
-	user_mail_auth_model := model.NewUserMailAuthModel(tx)
+	user_mail_auth_model := model.NewMailAuthModel(tx)
 	user_model = model.NewUserModel(tx)
 
 	// ランダムパスワード生成

@@ -52,8 +52,8 @@ func (s *Seeder) Dump(w io.Writer, tables ...string) {
 			s.DB.Find(&d)
 			dumpModelAsJson(w, d)
 
-		case "user_mail_auths":
-			d := []model.UserMailAuth{}
+		case "mail_auths":
+			d := []model.MailAuth{}
 			s.DB.Find(&d)
 			dumpModelAsJson(w, d)
 		}

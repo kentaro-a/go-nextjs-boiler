@@ -22,9 +22,10 @@ func TestVerifyMailAuth(t *testing.T) {
 
 	// valid token
 	{
-		var expected_user_mail_auth model.UserMailAuth
-		seeder.DB.Find(&expected_user_mail_auth, []int64{1})
-		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/test/%s", expected_user_mail_auth.Token), nil)
+		var expected_mail_auth model.MailAuth
+		seeder.DB.Find(&expected_mail_auth, []int64{1})
+
+		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/test/%s", expected_mail_auth.Token), nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -34,11 +35,12 @@ func TestVerifyMailAuth(t *testing.T) {
 		assert.Equal(t, 200, rec.Code)
 
 	}
+
 	// expired token
 	{
-		var expected_user_mail_auth model.UserMailAuth
-		seeder.DB.Find(&expected_user_mail_auth, []int64{2})
-		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/test/%s", expected_user_mail_auth.Token), nil)
+		var expected_mail_auth model.MailAuth
+		seeder.DB.Find(&expected_mail_auth, []int64{2})
+		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/test/%s", expected_mail_auth.Token), nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)
@@ -50,9 +52,9 @@ func TestVerifyMailAuth(t *testing.T) {
 	}
 	// inactive token
 	{
-		var expected_user_mail_auth model.UserMailAuth
-		seeder.DB.Find(&expected_user_mail_auth, []int64{3})
-		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/test/%s", expected_user_mail_auth.Token), nil)
+		var expected_mail_auth model.MailAuth
+		seeder.DB.Find(&expected_mail_auth, []int64{3})
+		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/test/%s", expected_mail_auth.Token), nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
 		e.ServeHTTP(rec, req)

@@ -6,11 +6,11 @@ import (
 	"time"
 )
 
-func UserMailAuthsFixture() []*model.UserMailAuth {
-	return []*model.UserMailAuth{
+func MailAuthsFixture() []*model.MailAuth {
+	return []*model.MailAuth{
 		{
 			ID:        1,
-			Function:  "pre_signup",
+			Function:  "user/pre_signup",
 			Mail:      "pre_signup_user1@test.com",
 			Token:     "pre_signup_ValidToken",
 			StatusFlg: 0,
@@ -20,7 +20,7 @@ func UserMailAuthsFixture() []*model.UserMailAuth {
 		},
 		{
 			ID:        2,
-			Function:  "pre_signup",
+			Function:  "user/pre_signup",
 			Mail:      "pre_signup_user2@test.com",
 			Token:     "pre_signup_ExpiredToken",
 			StatusFlg: 0,
@@ -30,7 +30,7 @@ func UserMailAuthsFixture() []*model.UserMailAuth {
 		},
 		{
 			ID:        3,
-			Function:  "pre_signup",
+			Function:  "user/pre_signup",
 			Mail:      "pre_signup_user3@test.com",
 			Token:     "pre_signup_InActiveToken",
 			StatusFlg: 1,
@@ -41,7 +41,7 @@ func UserMailAuthsFixture() []*model.UserMailAuth {
 
 		{
 			ID:        4,
-			Function:  "pre_forgot_password",
+			Function:  "user/pre_forgot_password",
 			Mail:      "pre_forgot_password_user1@test.com",
 			Token:     "pre_forgot_password_ValidToken",
 			StatusFlg: 0,
@@ -51,7 +51,7 @@ func UserMailAuthsFixture() []*model.UserMailAuth {
 		},
 		{
 			ID:        5,
-			Function:  "pre_forgot_password",
+			Function:  "user/pre_forgot_password",
 			Mail:      "pre_forgot_password_user2@test.com",
 			Token:     "pre_forgot_password_ExpiredToken",
 			StatusFlg: 0,
@@ -61,7 +61,7 @@ func UserMailAuthsFixture() []*model.UserMailAuth {
 		},
 		{
 			ID:        6,
-			Function:  "pre_forgot_password",
+			Function:  "user/pre_forgot_password",
 			Mail:      "pre_forgot_password_user3@test.com",
 			Token:     "pre_forgot_password_InActiveToken",
 			StatusFlg: 1,

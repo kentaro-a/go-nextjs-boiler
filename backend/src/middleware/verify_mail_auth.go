@@ -11,9 +11,9 @@ import (
 
 func (m Middleware) VerifyMailAuth(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		user_mail_auth := model.UserMailAuth{}
+		user_mail_auth := model.MailAuth{}
 		user_mail_auth.Token = c.Param("token")
-		user_mail_auth_model := model.NewUserMailAuthModel(m.DB)
+		user_mail_auth_model := model.NewMailAuthModel(m.DB)
 		is_expired, err := user_mail_auth_model.IsExpiredToken(&user_mail_auth)
 		if err != nil {
 			return response.SystemError(c, &app_log.Fields{

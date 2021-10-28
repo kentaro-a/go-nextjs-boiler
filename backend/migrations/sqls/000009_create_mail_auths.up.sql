@@ -24,12 +24,12 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- テーブルの構造 `user_mail_auths`
+-- テーブルの構造 `mail_auths`
 --
 
-CREATE TABLE `user_mail_auths` (
+CREATE TABLE `mail_auths` (
   `id` int(10) UNSIGNED NOT NULL,
-  `function` varchar(20) NOT NULL,
+  `function` varchar(255) NOT NULL,
   `mail` text NOT NULL,
   `token` varchar(255) NOT NULL,
   `status_flg` int(1) NOT NULL,
@@ -43,9 +43,9 @@ CREATE TABLE `user_mail_auths` (
 --
 
 --
--- テーブルのインデックス `user_mail_auths`
+-- テーブルのインデックス `mail_auths`
 --
-ALTER TABLE `user_mail_auths`
+ALTER TABLE `mail_auths`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -53,9 +53,9 @@ ALTER TABLE `user_mail_auths`
 --
 
 --
--- テーブルのAUTO_INCREMENT `user_mail_auths`
+-- テーブルのAUTO_INCREMENT `mail_auths`
 --
-ALTER TABLE `user_mail_auths`
+ALTER TABLE `mail_auths`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 COMMIT;
 

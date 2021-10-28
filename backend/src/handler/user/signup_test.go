@@ -44,7 +44,7 @@ func TestSignUp(t *testing.T) {
 		e, h, m, seeder := setup(t)
 		e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
-		var expected_user_mail_auth model.UserMailAuth
+		var expected_user_mail_auth model.MailAuth
 		seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 		name := "myname"
 		password := "12345678"
@@ -59,7 +59,7 @@ func TestSignUp(t *testing.T) {
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(t, 200, rec.Code)
 
-		model_user_mail_auth := model.NewUserMailAuthModel(seeder.DB)
+		model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
 		user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
 		assert.Nil(t, err)
 		assert.Equal(t, 0, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
@@ -80,7 +80,7 @@ func TestSignUp(t *testing.T) {
 				e, h, m, seeder := setup(t)
 				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
-				var expected_user_mail_auth model.UserMailAuth
+				var expected_user_mail_auth model.MailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := ""
 				password := "12345678"
@@ -95,7 +95,7 @@ func TestSignUp(t *testing.T) {
 				json.NewDecoder(rec.Body).Decode(&res)
 				assert.Equal(t, 400, rec.Code)
 
-				model_user_mail_auth := model.NewUserMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
 				assert.Nil(t, err)
 				assert.Equal(t, 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
@@ -111,7 +111,7 @@ func TestSignUp(t *testing.T) {
 				e, h, m, seeder := setup(t)
 				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
-				var expected_user_mail_auth model.UserMailAuth
+				var expected_user_mail_auth model.MailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				password := "12345678"
 				post_data, _ := json.Marshal(map[string]interface{}{"password": password})
@@ -125,7 +125,7 @@ func TestSignUp(t *testing.T) {
 				json.NewDecoder(rec.Body).Decode(&res)
 				assert.Equal(t, 400, rec.Code)
 
-				model_user_mail_auth := model.NewUserMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
 				assert.Nil(t, err)
 				assert.Equal(t, 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
@@ -141,7 +141,7 @@ func TestSignUp(t *testing.T) {
 				e, h, m, seeder := setup(t)
 				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
-				var expected_user_mail_auth model.UserMailAuth
+				var expected_user_mail_auth model.MailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := strings.Repeat("1", 256)
 				password := "12345678"
@@ -156,7 +156,7 @@ func TestSignUp(t *testing.T) {
 				json.NewDecoder(rec.Body).Decode(&res)
 				assert.Equal(t, 400, rec.Code)
 
-				model_user_mail_auth := model.NewUserMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
 				assert.Nil(t, err)
 				assert.Equal(t, 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
@@ -176,7 +176,7 @@ func TestSignUp(t *testing.T) {
 				e, h, m, seeder := setup(t)
 				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
-				var expected_user_mail_auth model.UserMailAuth
+				var expected_user_mail_auth model.MailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := "myname"
 				password := ""
@@ -191,7 +191,7 @@ func TestSignUp(t *testing.T) {
 				json.NewDecoder(rec.Body).Decode(&res)
 				assert.Equal(t, 400, rec.Code)
 
-				model_user_mail_auth := model.NewUserMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
 				assert.Nil(t, err)
 				assert.Equal(t, 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
@@ -207,7 +207,7 @@ func TestSignUp(t *testing.T) {
 				e, h, m, seeder := setup(t)
 				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
-				var expected_user_mail_auth model.UserMailAuth
+				var expected_user_mail_auth model.MailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := "myname"
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name})
@@ -221,7 +221,7 @@ func TestSignUp(t *testing.T) {
 				json.NewDecoder(rec.Body).Decode(&res)
 				assert.Equal(t, 400, rec.Code)
 
-				model_user_mail_auth := model.NewUserMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
 				assert.Nil(t, err)
 				assert.Equal(t, 1, len(user_mail_auths))
@@ -232,7 +232,7 @@ func TestSignUp(t *testing.T) {
 				e, h, m, seeder := setup(t)
 				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
-				var expected_user_mail_auth model.UserMailAuth
+				var expected_user_mail_auth model.MailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := "myname"
 				password := strings.Repeat("1", 65)
@@ -247,7 +247,7 @@ func TestSignUp(t *testing.T) {
 				json.NewDecoder(rec.Body).Decode(&res)
 				assert.Equal(t, 400, rec.Code)
 
-				model_user_mail_auth := model.NewUserMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
 				assert.Nil(t, err)
 				assert.Equal(t, 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
@@ -263,7 +263,7 @@ func TestSignUp(t *testing.T) {
 				e, h, m, seeder := setup(t)
 				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
-				var expected_user_mail_auth model.UserMailAuth
+				var expected_user_mail_auth model.MailAuth
 				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := "myname"
 				password := strings.Repeat("1", 7)
@@ -278,7 +278,7 @@ func TestSignUp(t *testing.T) {
 				json.NewDecoder(rec.Body).Decode(&res)
 				assert.Equal(t, 400, rec.Code)
 
-				model_user_mail_auth := model.NewUserMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
 				assert.Nil(t, err)
 				assert.Equal(t, 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
@@ -299,7 +299,7 @@ func TestSignUp(t *testing.T) {
 			e, h, m, seeder := setup(t)
 			e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
-			var expected_user_mail_auth model.UserMailAuth
+			var expected_user_mail_auth model.MailAuth
 			seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 			mail := expected_user_mail_auth.Mail
 			name := "myname"
@@ -334,7 +334,7 @@ func TestSignUp(t *testing.T) {
 			e, h, m, seeder := setup(t)
 			e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
 
-			var expected_user_mail_auth model.UserMailAuth
+			var expected_user_mail_auth model.MailAuth
 			seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 			name := "myname"
 			password := strings.Repeat("1", 8)
