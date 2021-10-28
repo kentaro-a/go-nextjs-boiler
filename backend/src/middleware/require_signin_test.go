@@ -9,30 +9,28 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRequireSignIn(t *testing.T) {
-	e, h, m, seeder := setup(t)
+func (suite *TestSuite) TestRequireSignIn() {
 
-	e.POST("/user/signin", h.UserHandler.SignIn)
-	e.POST("/user/dashboard", func(c echo.Context) error {
+	suite.e.POST("/user/signin", suite.handlers.UserHandler.SignIn)
+	suite.e.POST("/user/dashboard", func(c echo.Context) error {
 		cc := c.(*app_context.Context)
 		return response.Success(c, 200, map[string]interface{}{"user": cc.User}, nil)
-	}, m.RequireUserSignIn)
+	}, suite.m.RequireUserSignIn)
 
 	// Has session
 	{
 		var expected_user model.User
-		seeder.DB.Find(&expected_user, []int64{1})
+		suite.seeder.DB.Find(&expected_user, []int64{1})
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": expected_user.Mail, "password": "12345678abc"})
 		req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
-		e.ServeHTTP(rec, req)
+		suite.e.ServeHTTP(rec, req)
 
 		cookie := rec.Header().Get("Set-Cookie")
 
@@ -40,11 +38,11 @@ func TestRequireSignIn(t *testing.T) {
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		req.Header.Set("Cookie", cookie)
 		rec = httptest.NewRecorder()
-		e.ServeHTTP(rec, req)
+		suite.e.ServeHTTP(rec, req)
 
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
-		assert.Equal(t, 200, rec.Code)
+		assert.Equal(suite.T(), 200, rec.Code)
 
 		log.Println(res.Data)
 
@@ -52,19 +50,17 @@ func TestRequireSignIn(t *testing.T) {
 
 	// Invalid session
 	{
-
 		cookie := "mapp=MTYzMzA3MDQ0MHxCQXdBQVRJPXwReJY1tkoCaIDBycrcKTa8n3tJHMKieKhuuOjrLrpDiQ==; Path=/; Expires=Fri, 01 Oct 2021 07:40:40 GMT; Max-Age=3600"
 
 		req := httptest.NewRequest(http.MethodPost, "/user/dashboard", nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		req.Header.Set("Cookie", cookie)
 		rec := httptest.NewRecorder()
-		e.ServeHTTP(rec, req)
+		suite.e.ServeHTTP(rec, req)
 
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
-		assert.Equal(t, 401, rec.Code)
-
+		assert.Equal(suite.T(), 401, rec.Code)
 	}
 
 	// Missed cookie
@@ -73,12 +69,11 @@ func TestRequireSignIn(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/user/dashboard", nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
-		e.ServeHTTP(rec, req)
+		suite.e.ServeHTTP(rec, req)
 
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
-		assert.Equal(t, 401, rec.Code)
+		assert.Equal(suite.T(), 401, rec.Code)
 
 	}
-	teardown(t, e, seeder)
 }

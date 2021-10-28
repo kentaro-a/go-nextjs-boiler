@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"strings"
-	"testing"
 	"time"
 
 	echo "github.com/labstack/echo/v4"
@@ -17,9 +16,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestSignUpVerifyToken(t *testing.T) {
-	e, h, m, seeder := setup(t)
-	e.POST("/user/signup_verify_token/:token", h.SignUpVerifyToken, m.VerifyMailAuth)
+func (suite *TestSuite) TestSignUpVerifyToken() {
+	suite.e.POST("/user/signup_verify_token/:token", suite.h.SignUpVerifyToken, suite.m.VerifyMailAuth)
 
 	// 正常
 	{
@@ -27,25 +25,23 @@ func TestSignUpVerifyToken(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup_verify_token/%s", token), nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
-		e.ServeHTTP(rec, req)
+		suite.e.ServeHTTP(rec, req)
 
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
-		assert.Equal(t, 200, rec.Code)
+		assert.Equal(suite.T(), 200, rec.Code)
 	}
-
-	teardown(t, e, seeder)
 }
 
-func TestSignUp(t *testing.T) {
+func (suite *TestSuite) TestSignUp() {
 
 	// 正常
 	{
-		e, h, m, seeder := setup(t)
-		e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
+		suite.SetupTest()
+		suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
 
 		var expected_user_mail_auth model.MailAuth
-		seeder.DB.Find(&expected_user_mail_auth, []int64{1})
+		suite.seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 		name := "myname"
 		password := "12345678"
 		post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
@@ -53,23 +49,23 @@ func TestSignUp(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
-		e.ServeHTTP(rec, req)
+		suite.e.ServeHTTP(rec, req)
 
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
-		assert.Equal(t, 200, rec.Code)
+		assert.Equal(suite.T(), 200, rec.Code)
 
-		model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
+		model_user_mail_auth := model.NewMailAuthModel(suite.seeder.DB)
 		user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
-		assert.Nil(t, err)
-		assert.Equal(t, 0, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
+		assert.Nil(suite.T(), err)
+		assert.Equal(suite.T(), 0, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
 
-		model_user := model.NewUserModel(seeder.DB)
+		model_user := model.NewUserModel(suite.seeder.DB)
 		user, err := model_user.FindByMailPassword(expected_user_mail_auth.Mail, model_user.GetHashedPassword(password))
-		assert.Nil(t, err)
-		assert.NotEmpty(t, user)
+		assert.Nil(suite.T(), err)
+		assert.NotEmpty(suite.T(), user)
 
-		teardown(t, e, seeder)
+		suite.TearDownTest()
 	}
 
 	// Error: validaion
@@ -77,11 +73,11 @@ func TestSignUp(t *testing.T) {
 		// name
 		{
 			{
-				e, h, m, seeder := setup(t)
-				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
+				suite.SetupTest()
 
+				suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
 				var expected_user_mail_auth model.MailAuth
-				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
+				suite.seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := ""
 				password := "12345678"
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
@@ -89,60 +85,60 @@ func TestSignUp(t *testing.T) {
 				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
-				e.ServeHTTP(rec, req)
+				suite.e.ServeHTTP(rec, req)
 
 				res := response.ResponseSuccess{}
 				json.NewDecoder(rec.Body).Decode(&res)
-				assert.Equal(t, 400, rec.Code)
+				assert.Equal(suite.T(), 400, rec.Code)
 
-				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(suite.seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
-				assert.Nil(t, err)
-				assert.Equal(t, 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
+				assert.Nil(suite.T(), err)
+				assert.Equal(suite.T(), 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
 
-				model_user := model.NewUserModel(seeder.DB)
+				model_user := model.NewUserModel(suite.seeder.DB)
 				user, err := model_user.FindByMailPassword(expected_user_mail_auth.Mail, model_user.GetHashedPassword(password))
-				assert.ErrorIs(t, err, gorm.ErrRecordNotFound)
-				assert.Empty(t, user)
+				assert.ErrorIs(suite.T(), err, gorm.ErrRecordNotFound)
+				assert.Empty(suite.T(), user)
 
-				teardown(t, e, seeder)
+				suite.TearDownTest()
 			}
 			{
-				e, h, m, seeder := setup(t)
-				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
+				suite.SetupTest()
 
+				suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
 				var expected_user_mail_auth model.MailAuth
-				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
+				suite.seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				password := "12345678"
 				post_data, _ := json.Marshal(map[string]interface{}{"password": password})
 
 				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
-				e.ServeHTTP(rec, req)
+				suite.e.ServeHTTP(rec, req)
 
 				res := response.ResponseSuccess{}
 				json.NewDecoder(rec.Body).Decode(&res)
-				assert.Equal(t, 400, rec.Code)
+				assert.Equal(suite.T(), 400, rec.Code)
 
-				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(suite.seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
-				assert.Nil(t, err)
-				assert.Equal(t, 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
+				assert.Nil(suite.T(), err)
+				assert.Equal(suite.T(), 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
 
-				model_user := model.NewUserModel(seeder.DB)
+				model_user := model.NewUserModel(suite.seeder.DB)
 				user, err := model_user.FindByMailPassword(expected_user_mail_auth.Mail, model_user.GetHashedPassword(password))
-				assert.ErrorIs(t, err, gorm.ErrRecordNotFound)
-				assert.Empty(t, user)
+				assert.ErrorIs(suite.T(), err, gorm.ErrRecordNotFound)
+				assert.Empty(suite.T(), user)
 
-				teardown(t, e, seeder)
+				suite.TearDownTest()
 			}
 			{
-				e, h, m, seeder := setup(t)
-				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
+				suite.SetupTest()
 
+				suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
 				var expected_user_mail_auth model.MailAuth
-				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
+				suite.seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := strings.Repeat("1", 256)
 				password := "12345678"
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
@@ -150,34 +146,34 @@ func TestSignUp(t *testing.T) {
 				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
-				e.ServeHTTP(rec, req)
+				suite.e.ServeHTTP(rec, req)
 
 				res := response.ResponseSuccess{}
 				json.NewDecoder(rec.Body).Decode(&res)
-				assert.Equal(t, 400, rec.Code)
+				assert.Equal(suite.T(), 400, rec.Code)
 
-				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(suite.seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
-				assert.Nil(t, err)
-				assert.Equal(t, 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
+				assert.Nil(suite.T(), err)
+				assert.Equal(suite.T(), 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
 
-				model_user := model.NewUserModel(seeder.DB)
+				model_user := model.NewUserModel(suite.seeder.DB)
 				user, err := model_user.FindByMailPassword(expected_user_mail_auth.Mail, model_user.GetHashedPassword(password))
-				assert.ErrorIs(t, err, gorm.ErrRecordNotFound)
-				assert.Empty(t, user)
+				assert.ErrorIs(suite.T(), err, gorm.ErrRecordNotFound)
+				assert.Empty(suite.T(), user)
 
-				teardown(t, e, seeder)
+				suite.TearDownTest()
 			}
 		}
 
 		// password
 		{
 			{
-				e, h, m, seeder := setup(t)
-				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
+				suite.SetupTest()
 
+				suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
 				var expected_user_mail_auth model.MailAuth
-				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
+				suite.seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := "myname"
 				password := ""
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
@@ -185,55 +181,55 @@ func TestSignUp(t *testing.T) {
 				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
-				e.ServeHTTP(rec, req)
+				suite.e.ServeHTTP(rec, req)
 
 				res := response.ResponseSuccess{}
 				json.NewDecoder(rec.Body).Decode(&res)
-				assert.Equal(t, 400, rec.Code)
+				assert.Equal(suite.T(), 400, rec.Code)
 
-				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(suite.seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
-				assert.Nil(t, err)
-				assert.Equal(t, 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
+				assert.Nil(suite.T(), err)
+				assert.Equal(suite.T(), 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
 
-				model_user := model.NewUserModel(seeder.DB)
+				model_user := model.NewUserModel(suite.seeder.DB)
 				user, err := model_user.FindByMailPassword(expected_user_mail_auth.Mail, model_user.GetHashedPassword(password))
-				assert.ErrorIs(t, err, gorm.ErrRecordNotFound)
-				assert.Empty(t, user)
+				assert.ErrorIs(suite.T(), err, gorm.ErrRecordNotFound)
+				assert.Empty(suite.T(), user)
 
-				teardown(t, e, seeder)
+				suite.TearDownTest()
 			}
 			{
-				e, h, m, seeder := setup(t)
-				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
+				suite.SetupTest()
 
+				suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
 				var expected_user_mail_auth model.MailAuth
-				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
+				suite.seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := "myname"
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name})
 
 				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
-				e.ServeHTTP(rec, req)
+				suite.e.ServeHTTP(rec, req)
 
 				res := response.ResponseSuccess{}
 				json.NewDecoder(rec.Body).Decode(&res)
-				assert.Equal(t, 400, rec.Code)
+				assert.Equal(suite.T(), 400, rec.Code)
 
-				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(suite.seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
-				assert.Nil(t, err)
-				assert.Equal(t, 1, len(user_mail_auths))
+				assert.Nil(suite.T(), err)
+				assert.Equal(suite.T(), 1, len(user_mail_auths))
 
-				teardown(t, e, seeder)
+				suite.TearDownTest()
 			}
 			{
-				e, h, m, seeder := setup(t)
-				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
+				suite.SetupTest()
 
+				suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
 				var expected_user_mail_auth model.MailAuth
-				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
+				suite.seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := "myname"
 				password := strings.Repeat("1", 65)
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
@@ -241,30 +237,30 @@ func TestSignUp(t *testing.T) {
 				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
-				e.ServeHTTP(rec, req)
+				suite.e.ServeHTTP(rec, req)
 
 				res := response.ResponseSuccess{}
 				json.NewDecoder(rec.Body).Decode(&res)
-				assert.Equal(t, 400, rec.Code)
+				assert.Equal(suite.T(), 400, rec.Code)
 
-				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(suite.seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
-				assert.Nil(t, err)
-				assert.Equal(t, 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
+				assert.Nil(suite.T(), err)
+				assert.Equal(suite.T(), 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
 
-				model_user := model.NewUserModel(seeder.DB)
+				model_user := model.NewUserModel(suite.seeder.DB)
 				user, err := model_user.FindByMailPassword(expected_user_mail_auth.Mail, model_user.GetHashedPassword(password))
-				assert.ErrorIs(t, err, gorm.ErrRecordNotFound)
-				assert.Empty(t, user)
+				assert.ErrorIs(suite.T(), err, gorm.ErrRecordNotFound)
+				assert.Empty(suite.T(), user)
 
-				teardown(t, e, seeder)
+				suite.TearDownTest()
 			}
 			{
-				e, h, m, seeder := setup(t)
-				e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
+				suite.SetupTest()
 
+				suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
 				var expected_user_mail_auth model.MailAuth
-				seeder.DB.Find(&expected_user_mail_auth, []int64{1})
+				suite.seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 				name := "myname"
 				password := strings.Repeat("1", 7)
 				post_data, _ := json.Marshal(map[string]interface{}{"name": name, "password": password})
@@ -272,23 +268,23 @@ func TestSignUp(t *testing.T) {
 				req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 				rec := httptest.NewRecorder()
-				e.ServeHTTP(rec, req)
+				suite.e.ServeHTTP(rec, req)
 
 				res := response.ResponseSuccess{}
 				json.NewDecoder(rec.Body).Decode(&res)
-				assert.Equal(t, 400, rec.Code)
+				assert.Equal(suite.T(), 400, rec.Code)
 
-				model_user_mail_auth := model.NewMailAuthModel(seeder.DB)
+				model_user_mail_auth := model.NewMailAuthModel(suite.seeder.DB)
 				user_mail_auths, err := model_user_mail_auth.FindByMailFunction(expected_user_mail_auth.Mail, expected_user_mail_auth.Function)
-				assert.Nil(t, err)
-				assert.Equal(t, 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
+				assert.Nil(suite.T(), err)
+				assert.Equal(suite.T(), 1, len(user_mail_auths)) // Means user_mail_auths record has been deleted.
 
-				model_user := model.NewUserModel(seeder.DB)
+				model_user := model.NewUserModel(suite.seeder.DB)
 				user, err := model_user.FindByMailPassword(expected_user_mail_auth.Mail, model_user.GetHashedPassword(password))
-				assert.ErrorIs(t, err, gorm.ErrRecordNotFound)
-				assert.Empty(t, user)
+				assert.ErrorIs(suite.T(), err, gorm.ErrRecordNotFound)
+				assert.Empty(suite.T(), user)
 
-				teardown(t, e, seeder)
+				suite.TearDownTest()
 			}
 		}
 	}
@@ -296,17 +292,17 @@ func TestSignUp(t *testing.T) {
 	// すでに登録済みのメアド(なんらかの方法で別経路で登録された場合など)
 	{
 		{
-			e, h, m, seeder := setup(t)
-			e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
+			suite.SetupTest()
 
+			suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
 			var expected_user_mail_auth model.MailAuth
-			seeder.DB.Find(&expected_user_mail_auth, []int64{1})
+			suite.seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 			mail := expected_user_mail_auth.Mail
 			name := "myname"
 			password := strings.Repeat("1", 8)
 
 			// ユーザーを物理的にinsertする
-			user_model := model.NewUserModel(seeder.DB)
+			user_model := model.NewUserModel(suite.seeder.DB)
 			user_model.Create(&model.User{
 				Name:      "other name",
 				Mail:      mail,
@@ -321,21 +317,21 @@ func TestSignUp(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
-			e.ServeHTTP(rec, req)
+			suite.e.ServeHTTP(rec, req)
 
 			res := response.ResponseSuccess{}
 			json.NewDecoder(rec.Body).Decode(&res)
-			assert.Equal(t, 400, rec.Code)
+			assert.Equal(suite.T(), 400, rec.Code)
 
-			teardown(t, e, seeder)
+			suite.TearDownTest()
 		}
 
 		{
-			e, h, m, seeder := setup(t)
-			e.POST("/user/signup/:token", h.SignUp, m.VerifyMailAuth)
+			suite.SetupTest()
+			suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
 
 			var expected_user_mail_auth model.MailAuth
-			seeder.DB.Find(&expected_user_mail_auth, []int64{1})
+			suite.seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 			name := "myname"
 			password := strings.Repeat("1", 8)
 
@@ -348,7 +344,7 @@ func TestSignUp(t *testing.T) {
 					req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup/%s", expected_user_mail_auth.Token), bytes.NewReader(post_data))
 					req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 					rec := httptest.NewRecorder()
-					e.ServeHTTP(rec, req)
+					suite.e.ServeHTTP(rec, req)
 					ch <- rec.Code
 
 				}(post_data, ch)
@@ -363,9 +359,9 @@ func TestSignUp(t *testing.T) {
 					}
 				}
 			}
-			assert.Equal(t, 1, code200_count)
+			assert.Equal(suite.T(), 1, code200_count)
 
-			teardown(t, e, seeder)
+			suite.TearDownTest()
 		}
 	}
 

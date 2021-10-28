@@ -7,16 +7,13 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPreSignUp(t *testing.T) {
-	e, h, _, seeder := setup(t)
-
-	e.POST("/user/pre_signup", h.PreSignUp)
+func (suite *TestSuite) TestPreSignUp() {
+	suite.e.POST("/user/pre_signup", suite.h.PreSignUp)
 
 	// 正常
 	{
@@ -25,18 +22,18 @@ func TestPreSignUp(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
-		e.ServeHTTP(rec, req)
+		suite.e.ServeHTTP(rec, req)
 
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
-		assert.Equal(t, 200, rec.Code)
-		assert.Empty(t, res.Data)
+		assert.Equal(suite.T(), 200, rec.Code)
+		assert.Empty(suite.T(), res.Data)
 
-		m := model.NewMailAuthModel(seeder.DB)
+		m := model.NewMailAuthModel(suite.seeder.DB)
 		mail_auths, err := m.FindByMailFunction(mail, "user/pre_signup")
-		assert.Nil(t, err)
-		assert.Equal(t, 1, len(mail_auths)) // Means any other records which have the same mail and function are not found.
-		assert.Equal(t, mail, mail_auths[0].Mail)
+		assert.Nil(suite.T(), err)
+		assert.Equal(suite.T(), 1, len(mail_auths)) // Means any other records which have the same mail and function are not found.
+		assert.Equal(suite.T(), mail, mail_auths[0].Mail)
 	}
 
 	// 正常: すでに登録済みの仮登録データが削除され、最新のもののみ保持される
@@ -44,25 +41,25 @@ func TestPreSignUp(t *testing.T) {
 		mail := "pre_signup_user1@test.com"
 
 		// 既存の仮登録データが存在すること
-		m := model.NewMailAuthModel(seeder.DB)
+		m := model.NewMailAuthModel(suite.seeder.DB)
 		mail_auths_pre, err := m.FindByMailFunction(mail, "user/pre_signup")
-		assert.Nil(t, err)
-		assert.Equal(t, 1, len(mail_auths_pre)) // Means any other records which have the same mail and function are not found.
+		assert.Nil(suite.T(), err)
+		assert.Equal(suite.T(), 1, len(mail_auths_pre)) // Means any other records which have the same mail and function are not found.
 
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
 		req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
-		e.ServeHTTP(rec, req)
+		suite.e.ServeHTTP(rec, req)
 
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
-		assert.Equal(t, 200, rec.Code)
-		assert.Empty(t, res.Data)
+		assert.Equal(suite.T(), 200, rec.Code)
+		assert.Empty(suite.T(), res.Data)
 
 		mail_auths, err := m.FindByMailFunction(mail, "user/pre_signup")
-		assert.Nil(t, err)
-		assert.Equal(t, 1, len(mail_auths)) // Means any other records which have the same mail and function are not found.
+		assert.Nil(suite.T(), err)
+		assert.Equal(suite.T(), 1, len(mail_auths)) // Means any other records which have the same mail and function are not found.
 	}
 
 	// Error: 登録済みメールアドレス
@@ -72,17 +69,17 @@ func TestPreSignUp(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
-		e.ServeHTTP(rec, req)
+		suite.e.ServeHTTP(rec, req)
 
 		res := response.ResponseError{}
 		json.NewDecoder(rec.Body).Decode(&res)
-		assert.Equal(t, 400, rec.Code)
-		assert.Equal(t, 1, len(res.Error.Messages))
+		assert.Equal(suite.T(), 400, rec.Code)
+		assert.Equal(suite.T(), 1, len(res.Error.Messages))
 
-		m := model.NewMailAuthModel(seeder.DB)
+		m := model.NewMailAuthModel(suite.seeder.DB)
 		mail_auths, err := m.FindByMailFunction(mail, "user/pre_signup")
-		assert.Nil(t, err)
-		assert.Equal(t, 0, len(mail_auths))
+		assert.Nil(suite.T(), err)
+		assert.Equal(suite.T(), 0, len(mail_auths))
 	}
 
 	// Error: 不正なメールアドレス
@@ -93,17 +90,17 @@ func TestPreSignUp(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
-			e.ServeHTTP(rec, req)
+			suite.e.ServeHTTP(rec, req)
 
 			res := response.ResponseError{}
 			json.NewDecoder(rec.Body).Decode(&res)
-			assert.Equal(t, 400, rec.Code)
-			assert.Equal(t, 1, len(res.Error.Messages))
+			assert.Equal(suite.T(), 400, rec.Code)
+			assert.Equal(suite.T(), 1, len(res.Error.Messages))
 
-			m := model.NewMailAuthModel(seeder.DB)
+			m := model.NewMailAuthModel(suite.seeder.DB)
 			mail_auths, err := m.FindByMailFunction(mail, "user/pre_signup")
-			assert.Nil(t, err)
-			assert.Equal(t, 0, len(mail_auths))
+			assert.Nil(suite.T(), err)
+			assert.Equal(suite.T(), 0, len(mail_auths))
 		}
 		{
 			mail := ""
@@ -111,31 +108,30 @@ func TestPreSignUp(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
-			e.ServeHTTP(rec, req)
+			suite.e.ServeHTTP(rec, req)
 
 			res := response.ResponseError{}
 			json.NewDecoder(rec.Body).Decode(&res)
-			assert.Equal(t, 400, rec.Code)
-			assert.Equal(t, 1, len(res.Error.Messages))
+			assert.Equal(suite.T(), 400, rec.Code)
+			assert.Equal(suite.T(), 1, len(res.Error.Messages))
 
-			m := model.NewMailAuthModel(seeder.DB)
+			m := model.NewMailAuthModel(suite.seeder.DB)
 			mail_auths, err := m.FindByMailFunction(mail, "user/pre_signup")
-			assert.Nil(t, err)
-			assert.Equal(t, 0, len(mail_auths))
+			assert.Nil(suite.T(), err)
+			assert.Equal(suite.T(), 0, len(mail_auths))
 		}
 		{
 			post_data, _ := json.Marshal(map[string]interface{}{})
 			req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
-			e.ServeHTTP(rec, req)
+			suite.e.ServeHTTP(rec, req)
 
 			res := response.ResponseError{}
 			json.NewDecoder(rec.Body).Decode(&res)
-			assert.Equal(t, 400, rec.Code)
-			assert.Equal(t, 1, len(res.Error.Messages))
+			assert.Equal(suite.T(), 400, rec.Code)
+			assert.Equal(suite.T(), 1, len(res.Error.Messages))
 		}
 	}
-	teardown(t, e, seeder)
 
 }

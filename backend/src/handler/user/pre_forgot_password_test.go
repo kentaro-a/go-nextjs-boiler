@@ -7,16 +7,14 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	echo "github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPreForgotPassword(t *testing.T) {
-	e, h, _, seeder := setup(t)
+func (suite *TestSuite) TestPreForgotPassword() {
 
-	e.POST("/user/pre_forgot_password", h.PreForgotPassword)
+	suite.e.POST("/user/pre_forgot_password", suite.h.PreForgotPassword)
 
 	// 正常
 	{
@@ -25,16 +23,16 @@ func TestPreForgotPassword(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
-		e.ServeHTTP(rec, req)
+		suite.e.ServeHTTP(rec, req)
 
 		res := response.ResponseError{}
 		json.NewDecoder(rec.Body).Decode(&res)
-		assert.Equal(t, 200, rec.Code)
+		assert.Equal(suite.T(), 200, rec.Code)
 
-		m := model.NewMailAuthModel(seeder.DB)
+		m := model.NewMailAuthModel(suite.seeder.DB)
 		user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
-		assert.Nil(t, err)
-		assert.Equal(t, 1, len(user_mail_auths))
+		assert.Nil(suite.T(), err)
+		assert.Equal(suite.T(), 1, len(user_mail_auths))
 	}
 
 	// Error: 存在しないメールアドレス
@@ -44,17 +42,17 @@ func TestPreForgotPassword(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
-		e.ServeHTTP(rec, req)
+		suite.e.ServeHTTP(rec, req)
 
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
-		assert.Equal(t, 400, rec.Code)
-		assert.Empty(t, res.Data)
+		assert.Equal(suite.T(), 400, rec.Code)
+		assert.Empty(suite.T(), res.Data)
 
-		m := model.NewMailAuthModel(seeder.DB)
+		m := model.NewMailAuthModel(suite.seeder.DB)
 		user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
-		assert.Nil(t, err)
-		assert.Equal(t, 0, len(user_mail_auths))
+		assert.Nil(suite.T(), err)
+		assert.Equal(suite.T(), 0, len(user_mail_auths))
 	}
 
 	// Error: 不正なメールアドレス
@@ -65,17 +63,17 @@ func TestPreForgotPassword(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
-			e.ServeHTTP(rec, req)
+			suite.e.ServeHTTP(rec, req)
 
 			res := response.ResponseError{}
 			json.NewDecoder(rec.Body).Decode(&res)
-			assert.Equal(t, 400, rec.Code)
-			assert.Equal(t, 1, len(res.Error.Messages))
+			assert.Equal(suite.T(), 400, rec.Code)
+			assert.Equal(suite.T(), 1, len(res.Error.Messages))
 
-			m := model.NewMailAuthModel(seeder.DB)
+			m := model.NewMailAuthModel(suite.seeder.DB)
 			user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
-			assert.Nil(t, err)
-			assert.Equal(t, 0, len(user_mail_auths))
+			assert.Nil(suite.T(), err)
+			assert.Equal(suite.T(), 0, len(user_mail_auths))
 		}
 		{
 			mail := ""
@@ -83,31 +81,30 @@ func TestPreForgotPassword(t *testing.T) {
 			req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
-			e.ServeHTTP(rec, req)
+			suite.e.ServeHTTP(rec, req)
 
 			res := response.ResponseError{}
 			json.NewDecoder(rec.Body).Decode(&res)
-			assert.Equal(t, 400, rec.Code)
-			assert.Equal(t, 1, len(res.Error.Messages))
+			assert.Equal(suite.T(), 400, rec.Code)
+			assert.Equal(suite.T(), 1, len(res.Error.Messages))
 
-			m := model.NewMailAuthModel(seeder.DB)
+			m := model.NewMailAuthModel(suite.seeder.DB)
 			user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
-			assert.Nil(t, err)
-			assert.Equal(t, 0, len(user_mail_auths))
+			assert.Nil(suite.T(), err)
+			assert.Equal(suite.T(), 0, len(user_mail_auths))
 		}
 		{
 			post_data, _ := json.Marshal(map[string]interface{}{})
 			req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
-			e.ServeHTTP(rec, req)
+			suite.e.ServeHTTP(rec, req)
 
 			res := response.ResponseError{}
 			json.NewDecoder(rec.Body).Decode(&res)
-			assert.Equal(t, 400, rec.Code)
-			assert.Equal(t, 1, len(res.Error.Messages))
+			assert.Equal(suite.T(), 400, rec.Code)
+			assert.Equal(suite.T(), 1, len(res.Error.Messages))
 		}
 	}
-	teardown(t, e, seeder)
 
 }
