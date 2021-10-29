@@ -17,8 +17,7 @@ func (suite *TestSuite) TestVerifyMailAuth() {
 		return response.Success(c, 200, nil, nil)
 	}, suite.m.VerifyMailAuth)
 
-	// valid token
-	{
+	suite.Run("normal", func() {
 		var expected_mail_auth model.MailAuth
 		suite.seeder.DB.Find(&expected_mail_auth, []int64{1})
 
@@ -30,11 +29,9 @@ func (suite *TestSuite) TestVerifyMailAuth() {
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(suite.T(), 200, rec.Code)
+	})
 
-	}
-
-	// expired token
-	{
+	suite.Run("abnormal.expired_token", func() {
 		var expected_mail_auth model.MailAuth
 		suite.seeder.DB.Find(&expected_mail_auth, []int64{2})
 		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/test/%s", expected_mail_auth.Token), nil)
@@ -46,9 +43,9 @@ func (suite *TestSuite) TestVerifyMailAuth() {
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(suite.T(), 401, rec.Code)
 
-	}
-	// inactive token
-	{
+	})
+
+	suite.Run("abnormal.inactive_token", func() {
 		var expected_mail_auth model.MailAuth
 		suite.seeder.DB.Find(&expected_mail_auth, []int64{3})
 		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/test/%s", expected_mail_auth.Token), nil)
@@ -59,7 +56,6 @@ func (suite *TestSuite) TestVerifyMailAuth() {
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(suite.T(), 401, rec.Code)
-
-	}
+	})
 
 }

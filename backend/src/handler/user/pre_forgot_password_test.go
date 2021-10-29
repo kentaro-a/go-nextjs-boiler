@@ -14,10 +14,10 @@ import (
 
 func (suite *TestSuite) TestPreForgotPassword() {
 
-	suite.e.POST("/user/pre_forgot_password", suite.h.PreForgotPassword)
+	suite.Run("normal", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/pre_forgot_password", suite.h.PreForgotPassword)
 
-	// 正常
-	{
 		mail := "user1@test.com"
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
 		req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
@@ -33,9 +33,14 @@ func (suite *TestSuite) TestPreForgotPassword() {
 		user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
 		assert.Nil(suite.T(), err)
 		assert.Equal(suite.T(), 1, len(user_mail_auths))
-	}
-	// Error: 存在しないメールアドレス
-	{
+
+		suite.TearDownTest()
+	})
+
+	suite.Run("abnormal.unexist_mail", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/pre_forgot_password", suite.h.PreForgotPassword)
+
 		mail := "test@test.com"
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
 		req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
@@ -52,10 +57,15 @@ func (suite *TestSuite) TestPreForgotPassword() {
 		user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
 		assert.Nil(suite.T(), err)
 		assert.Equal(suite.T(), 0, len(user_mail_auths))
-	}
+
+		suite.TearDownTest()
+	})
 
 	// Error: 不正なメールアドレス
-	{
+	suite.Run("abnormal.invalid_mail", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/pre_forgot_password", suite.h.PreForgotPassword)
+
 		{
 			mail := "usertest.com"
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
@@ -104,5 +114,7 @@ func (suite *TestSuite) TestPreForgotPassword() {
 			assert.Equal(suite.T(), 400, rec.Code)
 			assert.Equal(suite.T(), 1, len(res.Error.Messages))
 		}
-	}
+
+		suite.TearDownTest()
+	})
 }

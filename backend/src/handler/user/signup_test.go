@@ -17,10 +17,9 @@ import (
 )
 
 func (suite *TestSuite) TestSignUpVerifyToken() {
-	suite.e.POST("/user/signup_verify_token/:token", suite.h.SignUpVerifyToken, suite.m.VerifyMailAuth)
+	suite.Run("normal", func() {
+		suite.e.POST("/user/signup_verify_token/:token", suite.h.SignUpVerifyToken, suite.m.VerifyMailAuth)
 
-	// 正常
-	{
 		token := "pre_signup_ValidToken"
 		req := httptest.NewRequest(http.MethodPost, fmt.Sprintf("/user/signup_verify_token/%s", token), nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -30,13 +29,18 @@ func (suite *TestSuite) TestSignUpVerifyToken() {
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(suite.T(), 200, rec.Code)
-	}
+
+		suite.TearDownTest()
+	})
+
 }
 
 func (suite *TestSuite) TestSignUp() {
 
-	// 正常
-	{
+	suite.Run("normal", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
+
 		suite.SetupTest()
 		suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
 
@@ -66,10 +70,12 @@ func (suite *TestSuite) TestSignUp() {
 		assert.NotEmpty(suite.T(), user)
 
 		suite.TearDownTest()
-	}
+	})
 
-	// Error: validaion
-	{
+	suite.Run("abnormal.validation", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
+
 		// name
 		{
 			{
@@ -287,14 +293,14 @@ func (suite *TestSuite) TestSignUp() {
 				suite.TearDownTest()
 			}
 		}
-	}
+	})
 
-	// すでに登録済みのメアド(なんらかの方法で別経路で登録された場合など)
-	{
+	suite.Run("abnormal.already_registered_mail", func() {
+
 		{
 			suite.SetupTest()
-
 			suite.e.POST("/user/signup/:token", suite.h.SignUp, suite.m.VerifyMailAuth)
+
 			var expected_user_mail_auth model.MailAuth
 			suite.seeder.DB.Find(&expected_user_mail_auth, []int64{1})
 			mail := expected_user_mail_auth.Mail
@@ -363,6 +369,7 @@ func (suite *TestSuite) TestSignUp() {
 
 			suite.TearDownTest()
 		}
-	}
+
+	})
 
 }

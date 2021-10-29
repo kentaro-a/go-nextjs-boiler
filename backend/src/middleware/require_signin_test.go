@@ -6,7 +6,6 @@ import (
 	"app/response"
 	"bytes"
 	"encoding/json"
-	"log"
 	"net/http"
 	"net/http/httptest"
 
@@ -22,8 +21,7 @@ func (suite *TestSuite) TestRequireSignIn() {
 		return response.Success(c, 200, map[string]interface{}{"user": cc.User}, nil)
 	}, suite.m.RequireUserSignIn)
 
-	// Has session
-	{
+	suite.Run("normal", func() {
 		var expected_user model.User
 		suite.seeder.DB.Find(&expected_user, []int64{1})
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": expected_user.Mail, "password": "12345678abc"})
@@ -44,12 +42,9 @@ func (suite *TestSuite) TestRequireSignIn() {
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(suite.T(), 200, rec.Code)
 
-		log.Println(res.Data)
+	})
 
-	}
-
-	// Invalid session
-	{
+	suite.Run("abnormal.invalid_session", func() {
 		cookie := "mapp=MTYzMzA3MDQ0MHxCQXdBQVRJPXwReJY1tkoCaIDBycrcKTa8n3tJHMKieKhuuOjrLrpDiQ==; Path=/; Expires=Fri, 01 Oct 2021 07:40:40 GMT; Max-Age=3600"
 
 		req := httptest.NewRequest(http.MethodPost, "/user/dashboard", nil)
@@ -61,11 +56,9 @@ func (suite *TestSuite) TestRequireSignIn() {
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(suite.T(), 401, rec.Code)
-	}
+	})
 
-	// Missed cookie
-	{
-
+	suite.Run("abnormal.missed_cookie", func() {
 		req := httptest.NewRequest(http.MethodPost, "/user/dashboard", nil)
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
@@ -74,6 +67,6 @@ func (suite *TestSuite) TestRequireSignIn() {
 		res := response.ResponseSuccess{}
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(suite.T(), 401, rec.Code)
+	})
 
-	}
 }

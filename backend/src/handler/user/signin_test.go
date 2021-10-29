@@ -14,10 +14,10 @@ import (
 
 func (suite *TestSuite) TestSignIn() {
 
-	suite.e.POST("/user/signin", suite.h.SignIn)
+	suite.Run("normal", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/signin", suite.h.SignIn)
 
-	// 正常
-	{
 		var expected_user model.User
 		suite.seeder.DB.Find(&expected_user, []int64{1})
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": expected_user.Mail, "password": "12345678abc"})
@@ -32,9 +32,13 @@ func (suite *TestSuite) TestSignIn() {
 		assert.Empty(suite.T(), res.Data)
 		assert.NotEmpty(suite.T(), rec.Header().Get("Set-Cookie"))
 
-	}
-	// status_flg=0のユーザー
-	{
+		suite.TearDownTest()
+	})
+
+	suite.Run("abnormal.inactive_user", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/signin", suite.h.SignIn)
+
 		var expected_user model.User
 		suite.seeder.DB.Find(&expected_user, []int64{3})
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": expected_user.Mail, "password": "12345678abc"})
@@ -47,9 +51,14 @@ func (suite *TestSuite) TestSignIn() {
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(suite.T(), 400, rec.Code)
 		assert.NotEmpty(suite.T(), res.Error)
-	}
-	// password違い
-	{
+
+		suite.TearDownTest()
+	})
+
+	suite.Run("abnormal.different_password", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/signin", suite.h.SignIn)
+
 		var expected_user model.User
 		suite.seeder.DB.Find(&expected_user, []int64{1})
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": expected_user.Mail, "password": "12345678abcd"})
@@ -63,10 +72,13 @@ func (suite *TestSuite) TestSignIn() {
 		assert.Equal(suite.T(), 400, rec.Code)
 		assert.NotEmpty(suite.T(), res.Error)
 
-	}
+		suite.TearDownTest()
+	})
 
-	// mail違い
-	{
+	suite.Run("abnormal.different_mail", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/signin", suite.h.SignIn)
+
 		var expected_user model.User
 		suite.seeder.DB.Find(&expected_user, []int64{1})
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": "dummy" + expected_user.Mail, "password": "12345678abc"})
@@ -80,10 +92,12 @@ func (suite *TestSuite) TestSignIn() {
 		assert.Equal(suite.T(), 400, rec.Code)
 		assert.NotEmpty(suite.T(), res.Error)
 
-	}
+		suite.TearDownTest()
+	})
 
-	// validation
-	{
+	suite.Run("abnormal.validation", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/signin", suite.h.SignIn)
 
 		{
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": "", "password": ""})
@@ -164,5 +178,6 @@ func (suite *TestSuite) TestSignIn() {
 			assert.Len(suite.T(), res.Error.Messages, 1)
 
 		}
-	}
+		suite.TearDownTest()
+	})
 }

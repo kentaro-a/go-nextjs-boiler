@@ -44,7 +44,7 @@ func (suite *TestSuite) SetupTest() {
 
 func (suite *TestSuite) TearDownTest() {
 	app_session.DeleteStore()
-	unSeedAll(suite.seeder)
+	// unSeedAll(suite.seeder)
 	suite.seeder.Close()
 }
 
@@ -57,10 +57,10 @@ func unSeedAll(seeder *tests.Seeder) {
 	seeder.UnSeed(truncate_tables...)
 }
 
-func (suite *TestSuite) GetSignInCookie(user_id int64) string {
+func (suite *TestSuite) GetSignInCookie(user_id uint) string {
 	suite.e.POST("/user/signin", suite.h.SignIn)
 	var user model.User
-	suite.seeder.DB.Find(&user, []int64{user_id})
+	suite.seeder.DB.First(&user, user_id)
 	post_data, _ := json.Marshal(map[string]interface{}{"mail": user.Mail, "password": "12345678abc"})
 	req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)

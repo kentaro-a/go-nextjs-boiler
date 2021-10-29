@@ -13,10 +13,10 @@ import (
 )
 
 func (suite *TestSuite) TestPreSignUp() {
-	suite.e.POST("/user/pre_signup", suite.h.PreSignUp)
+	suite.Run("normal", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/pre_signup", suite.h.PreSignUp)
 
-	// 正常
-	{
 		mail := "test@test.com"
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
 		req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
@@ -34,10 +34,14 @@ func (suite *TestSuite) TestPreSignUp() {
 		assert.Nil(suite.T(), err)
 		assert.Equal(suite.T(), 1, len(mail_auths)) // Means any other records which have the same mail and function are not found.
 		assert.Equal(suite.T(), mail, mail_auths[0].Mail)
-	}
 
-	// 正常: すでに登録済みの仮登録データが削除され、最新のもののみ保持される
-	{
+		suite.TearDownTest()
+	})
+
+	suite.Run("normal.removed_old_pre_signup_records", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/pre_signup", suite.h.PreSignUp)
+
 		mail := "pre_signup_user1@test.com"
 
 		// 既存の仮登録データが存在すること
@@ -60,10 +64,14 @@ func (suite *TestSuite) TestPreSignUp() {
 		mail_auths, err := m.FindByMailFunction(mail, "user/pre_signup")
 		assert.Nil(suite.T(), err)
 		assert.Equal(suite.T(), 1, len(mail_auths)) // Means any other records which have the same mail and function are not found.
-	}
 
-	// Error: 登録済みメールアドレス
-	{
+		suite.TearDownTest()
+	})
+
+	suite.Run("abnormal.exist_mail", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/pre_signup", suite.h.PreSignUp)
+
 		mail := "user1@test.com"
 		post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
 		req := httptest.NewRequest(http.MethodPost, "/user/pre_signup", bytes.NewReader(post_data))
@@ -80,10 +88,14 @@ func (suite *TestSuite) TestPreSignUp() {
 		mail_auths, err := m.FindByMailFunction(mail, "user/pre_signup")
 		assert.Nil(suite.T(), err)
 		assert.Equal(suite.T(), 0, len(mail_auths))
-	}
 
-	// Error: 不正なメールアドレス
-	{
+		suite.TearDownTest()
+	})
+
+	suite.Run("abnormal.invalid_mail", func() {
+		suite.SetupTest()
+		suite.e.POST("/user/pre_signup", suite.h.PreSignUp)
+
 		{
 			mail := "usertest.com"
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
@@ -132,6 +144,8 @@ func (suite *TestSuite) TestPreSignUp() {
 			assert.Equal(suite.T(), 400, rec.Code)
 			assert.Equal(suite.T(), 1, len(res.Error.Messages))
 		}
-	}
+
+		suite.TearDownTest()
+	})
 
 }
