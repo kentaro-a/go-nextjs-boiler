@@ -34,77 +34,77 @@ func (suite *TestSuite) TestPreForgotPassword() {
 		assert.Nil(suite.T(), err)
 		assert.Equal(suite.T(), 1, len(user_mail_auths))
 	}
-
-	// Error: 存在しないメールアドレス
-	{
-		mail := "test@test.com"
-		post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
-		req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
-		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-		rec := httptest.NewRecorder()
-		suite.e.ServeHTTP(rec, req)
-
-		res := response.ResponseSuccess{}
-		json.NewDecoder(rec.Body).Decode(&res)
-		assert.Equal(suite.T(), 400, rec.Code)
-		assert.Empty(suite.T(), res.Data)
-
-		m := model.NewMailAuthModel(suite.seeder.DB)
-		user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
-		assert.Nil(suite.T(), err)
-		assert.Equal(suite.T(), 0, len(user_mail_auths))
-	}
-
-	// Error: 不正なメールアドレス
-	{
+	/*
+		// Error: 存在しないメールアドレス
 		{
-			mail := "usertest.com"
+			mail := "test@test.com"
 			post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
 			req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			suite.e.ServeHTTP(rec, req)
 
-			res := response.ResponseError{}
+			res := response.ResponseSuccess{}
 			json.NewDecoder(rec.Body).Decode(&res)
 			assert.Equal(suite.T(), 400, rec.Code)
-			assert.Equal(suite.T(), 1, len(res.Error.Messages))
+			assert.Empty(suite.T(), res.Data)
 
 			m := model.NewMailAuthModel(suite.seeder.DB)
 			user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
 			assert.Nil(suite.T(), err)
 			assert.Equal(suite.T(), 0, len(user_mail_auths))
 		}
+
+		// Error: 不正なメールアドレス
 		{
-			mail := ""
-			post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
-			req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
-			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-			rec := httptest.NewRecorder()
-			suite.e.ServeHTTP(rec, req)
+			{
+				mail := "usertest.com"
+				post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
+				req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
+				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+				rec := httptest.NewRecorder()
+				suite.e.ServeHTTP(rec, req)
 
-			res := response.ResponseError{}
-			json.NewDecoder(rec.Body).Decode(&res)
-			assert.Equal(suite.T(), 400, rec.Code)
-			assert.Equal(suite.T(), 1, len(res.Error.Messages))
+				res := response.ResponseError{}
+				json.NewDecoder(rec.Body).Decode(&res)
+				assert.Equal(suite.T(), 400, rec.Code)
+				assert.Equal(suite.T(), 1, len(res.Error.Messages))
 
-			m := model.NewMailAuthModel(suite.seeder.DB)
-			user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
-			assert.Nil(suite.T(), err)
-			assert.Equal(suite.T(), 0, len(user_mail_auths))
+				m := model.NewMailAuthModel(suite.seeder.DB)
+				user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
+				assert.Nil(suite.T(), err)
+				assert.Equal(suite.T(), 0, len(user_mail_auths))
+			}
+			{
+				mail := ""
+				post_data, _ := json.Marshal(map[string]interface{}{"mail": mail})
+				req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
+				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+				rec := httptest.NewRecorder()
+				suite.e.ServeHTTP(rec, req)
+
+				res := response.ResponseError{}
+				json.NewDecoder(rec.Body).Decode(&res)
+				assert.Equal(suite.T(), 400, rec.Code)
+				assert.Equal(suite.T(), 1, len(res.Error.Messages))
+
+				m := model.NewMailAuthModel(suite.seeder.DB)
+				user_mail_auths, err := m.FindByMailFunction(mail, "user/pre_forgot_password")
+				assert.Nil(suite.T(), err)
+				assert.Equal(suite.T(), 0, len(user_mail_auths))
+			}
+			{
+				post_data, _ := json.Marshal(map[string]interface{}{})
+				req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
+				req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+				rec := httptest.NewRecorder()
+				suite.e.ServeHTTP(rec, req)
+
+				res := response.ResponseError{}
+				json.NewDecoder(rec.Body).Decode(&res)
+				assert.Equal(suite.T(), 400, rec.Code)
+				assert.Equal(suite.T(), 1, len(res.Error.Messages))
+			}
 		}
-		{
-			post_data, _ := json.Marshal(map[string]interface{}{})
-			req := httptest.NewRequest(http.MethodPost, "/user/pre_forgot_password", bytes.NewReader(post_data))
-			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-			rec := httptest.NewRecorder()
-			suite.e.ServeHTTP(rec, req)
-
-			res := response.ResponseError{}
-			json.NewDecoder(rec.Body).Decode(&res)
-			assert.Equal(suite.T(), 400, rec.Code)
-			assert.Equal(suite.T(), 1, len(res.Error.Messages))
-		}
-	}
-
+	*/
 }

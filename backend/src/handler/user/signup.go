@@ -80,7 +80,7 @@ func (h Handler) SignUp(c echo.Context) error {
 	}
 
 	// トークン付きの本登録URLをメールで送信
-	sender := mail.NewSender("signup", user.Mail, "会員登録完了のお知らせ", map[string]string{
+	sender := mail.NewSender("user/signup", user.Mail, "会員登録完了のお知らせ", map[string]string{
 		"@NAME@":       user.Name,
 		"@SIGNIN_URL@": fmt.Sprintf("%ssignin", config.Get().App.Domain),
 	})

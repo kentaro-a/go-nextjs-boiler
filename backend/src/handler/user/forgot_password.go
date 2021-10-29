@@ -72,7 +72,7 @@ func (h Handler) ForgotPassword(c echo.Context) error {
 	}
 
 	// トークン付きの本登録URLをメールで送信
-	sender := mail.NewSender("forgot_password", user.Mail, "パスワード再発行完了のお知らせ", map[string]string{
+	sender := mail.NewSender("user/forgot_password", user.Mail, "パスワード再発行完了のお知らせ", map[string]string{
 		"@NAME@":         user.Name,
 		"@SIGNIN_URL@":   fmt.Sprintf("%ssignin", config.Get().App.Domain),
 		"@NEW_PASSWORD@": new_password,

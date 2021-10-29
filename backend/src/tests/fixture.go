@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 
 	_ "github.com/DATA-DOG/go-txdb"
@@ -19,9 +20,14 @@ type Seeder struct {
 }
 
 func NewSeeder() *Seeder {
-	gormdb, _ := gorm.Open(mysql.Open(model.GetDSN()), &gorm.Config{
+	gormdb, err := gorm.Open(mysql.Open(model.GetDSN()), &gorm.Config{
 		// Logger: logger.Default.LogMode(logger.Silent),
 	})
+	if err != nil {
+		log.Println("----------------")
+		log.Println(err)
+		log.Println("----------------")
+	}
 	return &Seeder{
 		DB: gormdb,
 	}

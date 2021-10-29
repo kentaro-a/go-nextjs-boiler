@@ -73,7 +73,7 @@ func (h Handler) PreForgotPassword(c echo.Context) error {
 	}
 
 	// トークン付きの再発行URLをメールで送信
-	sender := mail.NewSender("pre_forgot_password", user_mail_auth.Mail, "パスワード再発行に関しまして", map[string]string{
+	sender := mail.NewSender("user/pre_forgot_password", user_mail_auth.Mail, "パスワード再発行に関しまして", map[string]string{
 		"@MAIL@":                user_mail_auth.Mail,
 		"@FORGOT_PASSWORD_URL@": fmt.Sprintf("%sforgot_password/%s", config.Get().App.FrontendDomain, user_mail_auth.Token),
 	})

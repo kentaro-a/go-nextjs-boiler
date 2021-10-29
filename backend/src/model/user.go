@@ -54,6 +54,11 @@ func (m *UserModel) Save(user *User) error {
 	return errors.WithStack(err)
 }
 
+func (m *UserModel) Delete(user *User) error {
+	err := m.DB.Delete(user).Error
+	return errors.WithStack(err)
+}
+
 func (m *UserModel) IsMailExist(mail string) (bool, *User, error) {
 	is_exist := false
 	user := User{}
@@ -74,6 +79,12 @@ func (m *UserModel) IsMailExist(mail string) (bool, *User, error) {
 		}
 	}
 	return is_exist, &user, errors.WithStack(err)
+}
+
+func (m *UserModel) FindByID(user_id uint) (*User, error) {
+	var user User
+	err := m.DB.First(&user, user_id).Error
+	return &user, errors.WithStack(err)
 }
 
 func (m *UserModel) FindByMail(mail string) (*User, error) {

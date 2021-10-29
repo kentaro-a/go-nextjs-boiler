@@ -50,6 +50,14 @@ func Get(c echo.Context, key string) (*sessions.Session, error) {
 	return sess, err
 }
 
+func DeleteSession(c echo.Context, key string) {
+	sess, err := session.Get(key, c)
+	if err == nil {
+		sess.Options.MaxAge = -1
+		sess.Save(c.Request(), c.Response())
+	}
+}
+
 func IsSignedIn(c echo.Context) (bool, model.User) {
 	conf := config.Get()
 	sess, _ := session.Get(conf.Session.Key, c)
