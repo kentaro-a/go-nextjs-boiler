@@ -69,9 +69,8 @@ func (h Handler) Delete(c echo.Context) error {
 
 	tx.Commit()
 
-	// TODO: Not work
 	// セッション削除
-	session.DeleteSession(c, config.Get().Session.Key)
+	session.DeleteSession(c, h.DB, config.Get().Session.Key)
 
 	return response.Success(c, 200, nil, nil)
 }

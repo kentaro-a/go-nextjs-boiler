@@ -50,11 +50,11 @@ func Get(c echo.Context, key string) (*sessions.Session, error) {
 	return sess, err
 }
 
-func DeleteSession(c echo.Context, key string) {
+func DeleteSession(c echo.Context, db *gorm.DB, key string) {
+	store := GetStore(db)
 	sess, err := session.Get(key, c)
 	if err == nil {
-		sess.Options.MaxAge = -1
-		sess.Save(c.Request(), c.Response())
+		store.Delete(c.Request(), c.Response(), sess)
 	}
 }
 
