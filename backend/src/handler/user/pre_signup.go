@@ -72,8 +72,10 @@ func (h Handler) PreSignUp(c echo.Context) error {
 	}
 
 	// トークン付きの本登録URLをメールで送信
+	lifetime, _ := time.ParseDuration(fmt.Sprintf("%ds", config.Get().App.PreSignUp.Lifetime))
 	sender := mail.NewSender("user/pre_signup", user_mail_auth.Mail, "仮登録完了のお知らせ", map[string]string{
 		"@MAIL@":       user_mail_auth.Mail,
+		"@LIFETIME@":   fmt.Sprintf("%.0f分", lifetime.Minutes()),
 		"@SIGNUP_URL@": fmt.Sprintf("%ssignup/%s", config.Get().App.FrontendDomain, user_mail_auth.Token),
 	})
 	err = sender.Send()

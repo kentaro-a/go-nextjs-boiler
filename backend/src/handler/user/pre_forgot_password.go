@@ -73,8 +73,10 @@ func (h Handler) PreForgotPassword(c echo.Context) error {
 	}
 
 	// トークン付きの再発行URLをメールで送信
+	lifetime, _ := time.ParseDuration(fmt.Sprintf("%ds", config.Get().App.PreForgotPassword.Lifetime))
 	sender := mail.NewSender("user/pre_forgot_password", user_mail_auth.Mail, "パスワード再発行に関しまして", map[string]string{
 		"@MAIL@":                user_mail_auth.Mail,
+		"@LIFETIME@":            fmt.Sprintf("%.0f分", lifetime.Minutes()),
 		"@FORGOT_PASSWORD_URL@": fmt.Sprintf("%sforgot_password/%s", config.Get().App.FrontendDomain, user_mail_auth.Token),
 	})
 	err = sender.Send()
