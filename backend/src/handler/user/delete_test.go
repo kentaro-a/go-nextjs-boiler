@@ -64,7 +64,9 @@ func (suite *TestSuite) TestDelete() {
 
 		var expected_user model.User
 		suite.seeder.DB.Find(&expected_user, []int64{1})
-		post_data, _ := json.Marshal(map[string]interface{}{"mail": expected_user.Mail, "password": "12345678abcd"})
+
+		password := "12345678abcd"
+		post_data, _ := json.Marshal(map[string]interface{}{"mail": expected_user.Mail, "password": password})
 		req := httptest.NewRequest(http.MethodPost, "/user/signin", bytes.NewReader(post_data))
 		req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 		rec := httptest.NewRecorder()
@@ -74,6 +76,12 @@ func (suite *TestSuite) TestDelete() {
 		json.NewDecoder(rec.Body).Decode(&res)
 		assert.Equal(suite.T(), 400, rec.Code)
 		assert.NotEmpty(suite.T(), res.Error)
+
+		// user has not been deleted.
+		var actual_user model.User
+		ret := suite.seeder.DB.First(&actual_user, expected_user.ID)
+		assert.Nil(suite.T(), ret.Error)
+		assert.Equal(suite.T(), expected_user, actual_user)
 
 		suite.TearDownTest()
 	})

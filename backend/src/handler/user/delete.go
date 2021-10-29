@@ -46,6 +46,7 @@ func (h Handler) Delete(c echo.Context) error {
 
 	err = user_model.Delete(user)
 	if err != nil {
+		tx.Rollback()
 		return response.SystemError(c, &app_log.Fields{
 			ScriptInfo: app_log.GetScriptInfo(runtime.Caller(0)),
 			Messages:   []string{err.Error()},
