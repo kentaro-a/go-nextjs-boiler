@@ -4,9 +4,9 @@ import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
 import {GetServerSideProps} from 'next'
-import Cookies from "js-cookie"
 import { useRouter } from "next/router"
 import { useState } from 'react'
+import React from 'react'
 
 interface Props {
 	dt: string
@@ -21,31 +21,31 @@ const SignIn: NextPage<Props> = (props) => {
 		password: '',
 	})
 
-	const handleChange = (e) => {
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value
 		const name = e.target.name
-		console.log(value, name)
 		setValues({...values, [name]: value})
 	}
 
 	const signIn = async () => {
-		// Cookies.set("signedIn","true")
-		// router.replace("/user/dashboard")
 		try {
-			const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/user/signin`, {
+			const res = await fetch(`/api/proxy/user/signin`, {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },	
+				headers: {
+					'Content-Type': 'application/json',
+				},
 				body: JSON.stringify(values),
 			})
-			console.log(res)
-		} catch (e) {
+			const data = await res.json()
+			console.log(data)
 
+		} catch (e) {
 			console.log(e)
 		}	
-		
-		// const data = await res.json()
-		// console.log(data)
 	}
+
+
+	
 
 	return (
 		<div>
