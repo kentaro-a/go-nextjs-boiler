@@ -70,6 +70,10 @@ func (suite *TestSuite) GetSignInCookie(user_id uint) string {
 	return cookie
 }
 
+func (suite *TestSuite) GetInvalidSignInCookie() string {
+	return "mapp=MTYzNTI5ODI3M3xCQXdBQVRFPXwQDLpnxxtZT-ETDMY3pfj5tH3OQzjioupuQ8G0o45e4w==; Path=/; Expires=Wed, 27 Oct 2021 02:31:13 GMT; Max-Age=3600"
+}
+
 func TestTestSuite(t *testing.T) {
 	suite.Run(t, new(TestSuite))
 }

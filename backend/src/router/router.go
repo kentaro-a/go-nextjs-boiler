@@ -35,6 +35,7 @@ func New() (*echo.Echo, error) {
 		g.POST("/signup_verify_token/:token", h.SignUpVerifyToken, m.VerifyMailAuth)
 		g.POST("/signup/:token", h.SignUp, m.VerifyMailAuth)
 		g.POST("/signin", h.SignIn)
+		g.POST("/signout", h.SignOut, m.RequireUserSignIn)
 		g.POST("/pre_forgot_password", h.PreForgotPassword)
 		g.POST("/forgot_password_verify_token/:token", h.ForgotPasswordVerifyToken, m.VerifyMailAuth)
 		g.POST("/forgot_password/:token", h.ForgotPassword, m.VerifyMailAuth)
