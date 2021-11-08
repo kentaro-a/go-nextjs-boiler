@@ -25,7 +25,7 @@ func Success(c echo.Context, status_code int, data interface{}, log_fields *app_
 }
 
 type ResponseError struct {
-	Error app_error.Error `json:"error"`
+	app_error.Error
 }
 
 func Error(c echo.Context, status_code int, messages []string, log_fields *app_log.Fields) error {

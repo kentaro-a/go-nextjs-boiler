@@ -1,6 +1,7 @@
 package router
 
 import (
+	health_check_handler "app/handler/health_check"
 	user_handler "app/handler/user"
 	app_middleware "app/middleware"
 	"app/model"
@@ -24,8 +25,13 @@ func New() (*echo.Echo, error) {
 	e.Use(app_middleware.Context)
 	e.Use(middleware.Recover())
 	e.Use(m.Session())
-	e.Use(app_middleware.Cors())
+	// e.Use(app_middleware.Cors())
 	e.Use(app_middleware.AccessLog)
+
+	{
+		h := health_check_handler.Handler{DB: db}
+		e.POST("/health_check", h.HealthCheck)
+	}
 
 	{
 		g := e.Group("/user")

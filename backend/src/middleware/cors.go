@@ -12,7 +12,7 @@ func Cors() echo.MiddlewareFunc {
 	c := config.Get()
 	return middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: c.Web.Cors.AllowOrigins,
-		AllowMethods: []string{http.MethodGet, http.MethodPut, http.MethodPost, http.MethodDelete},
+		AllowMethods: []string{http.MethodGet, http.MethodPost},
 		AllowHeaders: []string{
 			"Access-Control-Allow-Headers",
 			"Content-Type",
