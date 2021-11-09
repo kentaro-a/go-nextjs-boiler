@@ -7,7 +7,7 @@ export const config = {
 		bodyParser: false
 	},
 }
-
+// NextJSの/api/proxy/*へのリクエストをbackendにプロキシする
 export default (req: NextApiRequest, res: NextApiResponse): Promise<any> => {
 	const proxy = httpProxyMiddleware(req, res, {
 		target: process.env.BACKEND,

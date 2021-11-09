@@ -37,6 +37,7 @@ func New() (*echo.Echo, error) {
 		g := e.Group("/user")
 		h := user_handler.Handler{DB: db}
 
+		g.POST("/verify_signin", h.VerifySignIn, m.RequireUserSignIn)
 		g.POST("/pre_signup", h.PreSignUp)
 		g.POST("/signup_verify_token/:token", h.SignUpVerifyToken, m.VerifyMailAuth)
 		g.POST("/signup/:token", h.SignUp, m.VerifyMailAuth)

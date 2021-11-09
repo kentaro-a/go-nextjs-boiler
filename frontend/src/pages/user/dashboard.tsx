@@ -3,46 +3,43 @@ import {NextPageContext} from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import {GetServerSideProps} from 'next'
 import Link from "next/link"
 import { useRouter } from "next/router"
-import RequireSignIn from "../../components/require_signin"
+import { useRequireUserSignin } from "../../hooks/useRequireUserSignin"
+import { useRecoilState, useResetRecoilState, RecoilRoot } from 'recoil'
+import { BackendProxyRequest, ApiResponse } from "../../components/api"
+import { signinUserState } from '../../states/signinUserState'
+import Me from '../../components/Me'
 
-interface Props {
-}
 
-const Dashboard: NextPage<Props> = (props) => {
+
+const Dashboard: NextPage = () => {
+	
+	useRequireUserSignin()
+
 	const router = useRouter()
+	const [signinUser, setSigninUser] = useRecoilState(signinUserState)
+	const resetSigninUserState = useResetRecoilState(signinUserState)
 
-	const logout = () => {
-		router.replace("/user/signin")
-	}
-	const test = async () => {
+	const signout = async () => {
 		try {
-			const res = await fetch(`/api/proxy/user/dashboard`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-			})
-			const data = await res.json()
-			console.log(data)
-
+			const data: ApiResponse = await BackendProxyRequest(`/user/signout`)
+			if (data.statusCode === 200) {
+				resetSigninUserState()
+				router.reload()
+			}
+			
 		} catch (e) {
 			console.log(e)
-		}	
+		}
+
 	}
 
 	const deleteUser = async () => {
 		try {
-			const res = await fetch(`/api/proxy/user/delete`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({password: "12345678abc"}),
+			const data = await BackendProxyRequest(`/user/delete`, {
+				password: "12345678abc",
 			})
-			const data = await res.json()
 			console.log(data)
 
 		} catch (e) {
@@ -51,35 +48,23 @@ const Dashboard: NextPage<Props> = (props) => {
 	}
 	
 	return (
-		<RequireSignIn>
+		<div>
 			<div>
-				<div>
-					dashboard
-				</div>
-
-				<div>
-					<button type="button" onClick={test}>dashboard</button>
-				</div>
-				<div>
-					<button type="button" onClick={deleteUser}>delete</button>
-				</div>
+				dashboard
 			</div>
-		</RequireSignIn>
+			<Me />
+			<div>
+				<button type="button" onClick={signout}>Sign out</button>
+			</div>
+			<div>
+				<button type="button" onClick={deleteUser}>delete</button>
+			</div>
+		</div>
 	)
 }
 
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-	console.log("dashboard")
-	// return {
-	// 	redirect: {
-	//       permanent: false, // 永続的なリダイレクトかどうか
-	//       destination: 'https://www.yahoo.co.jp/', // リダイレクト先
-	//     },
-	// }
-		
-	return {props: {}}
-}
+
 
 
 export default Dashboard 
